@@ -429,16 +429,16 @@ const BilibiliIframe = ({ src, attribs }) => {
   return (
     <iframe
       {...restAttribs}
-      allow={
-        restAttribs.allow ||
-        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      }
       allowFullScreen={allowfullscreen !== "false"}
       frameBorder={frameborder || "0"}
       loading="lazy"
       referrerPolicy="origin"
       src={normalizedSrc}
       title={iframeTitle}
+      allow={
+        restAttribs.allow ||
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      }
     />
   )
 }
@@ -461,16 +461,16 @@ const handleIframe = (node) => {
     return (
       <iframe
         {...restAttribs}
-        allow={
-          restAttribs.allow ||
-          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        }
         allowFullScreen={allowfullscreen !== "false"}
         frameBorder={frameborder || "0"}
         loading="lazy"
         referrerPolicy="strict-origin-when-cross-origin"
         src={src}
         title={iframeTitle}
+        allow={
+          restAttribs.allow ||
+          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        }
       />
     )
   }
@@ -478,25 +478,36 @@ const handleIframe = (node) => {
   return (
     <iframe
       {...restAttribs}
-      allow={
-        restAttribs.allow ||
-        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      }
       allowFullScreen={allowfullscreen !== "false"}
       frameBorder={frameborder || "0"}
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
       src={src}
       title={iframeTitle}
+      allow={
+        restAttribs.allow ||
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      }
     />
   )
 }
+
+const BLOCKED_CONTENT_TAGS = new Set(["script", "style", "link", "meta", "head", "html", "body"])
 
 const getHtmlParserOptions = (imageSources, togglePhotoSlider) => {
   const options = {
     replace: (node) => {
       if (node.type !== "tag") {
         return node
+      }
+
+      if (BLOCKED_CONTENT_TAGS.has(node.name)) {
+        return null
+      }
+
+      // Prevent external content from overriding app typography/layout.
+      if (node.attribs?.style && node.name !== "iframe") {
+        delete node.attribs.style
       }
 
       switch (node.name) {
@@ -579,6 +590,7 @@ const ArticleDetail = forwardRef((_, ref) => {
   const { id: feedId, title: feedTitle } = activeContent.feed
 
   const { coverSource, mediaPlayerEnclosure, isMedia } = activeContent
+  const normalizedFontSize = Math.min(1.25, Math.max(0.75, Number(fontSize) || 1.05))
 
   const getResponsiveMaxWidth = () => {
     if (isBelowMedium) {
@@ -658,7 +670,7 @@ const ArticleDetail = forwardRef((_, ref) => {
             key={activeContent.id}
             className="article-body"
             style={{
-              fontSize: `${fontSize}rem`,
+              fontSize: `${normalizedFontSize}rem`,
               maxWidth: getResponsiveMaxWidth(),
               fontFamily: fontFamily,
               "--article-width": articleWidth,

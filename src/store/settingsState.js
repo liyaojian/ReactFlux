@@ -33,6 +33,14 @@ const defaultValue = {
   updateContentOnFetch: false,
 }
 
+const clampNumber = (value, min, max, fallback) => {
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) {
+    return fallback
+  }
+  return Math.min(max, Math.max(min, numericValue))
+}
+
 export const settingsState = persistentAtom("settings", defaultValue, {
   encode: (value) => {
     const filteredValue = {}
@@ -47,7 +55,12 @@ export const settingsState = persistentAtom("settings", defaultValue, {
   },
   decode: (str) => {
     const storedValue = JSON.parse(str)
-    return { ...defaultValue, ...storedValue }
+    const mergedValue = { ...defaultValue, ...storedValue }
+    return {
+      ...mergedValue,
+      articleWidth: clampNumber(mergedValue.articleWidth, 50, 100, defaultValue.articleWidth),
+      fontSize: clampNumber(mergedValue.fontSize, 0.75, 1.25, defaultValue.fontSize),
+    }
   },
 })
 

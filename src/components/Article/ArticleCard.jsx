@@ -9,7 +9,7 @@ import {
   IconStarFill,
 } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 import FeedIcon from "@/components/ui/FeedIcon"
 import useEntryActions from "@/hooks/useEntryActions"
@@ -17,60 +17,11 @@ import { polyglotState } from "@/hooks/useLanguage"
 import { contentState } from "@/store/contentState"
 import { dataState } from "@/store/dataState"
 import { settingsState } from "@/store/settingsState"
-import { WIDE_IMAGE_RATIO } from "@/utils/constants"
 import { generateReadingTime, generateRelativeTime } from "@/utils/date"
 import "./ArticleCard.css"
 
-const ArticleCardImage = ({ entry, isWideImage }) => {
-  const imageSize = isWideImage
-    ? { width: "100%", height: "100%" }
-    : { width: "80px", height: "80px" }
-
-  const { coverDisplayMode } = useStore(settingsState)
-
-  const imageStyle = {
-    width: imageSize.width,
-    height: imageSize.height,
-    // When set to banner mode, add maximum height limit and object-fit style
-    ...(coverDisplayMode === "banner" && {
-      maxHeight: "183px",
-      objectFit: "cover",
-    }),
-  }
-
-  return (
-    <div className="card-thumbnail">
-      <img alt={entry.id} src={entry.coverSource} style={imageStyle} />
-    </div>
-  )
-}
-
-const extractTextFromHtml = (html) => {
-  if (!html) {
-    return ""
-  }
-
-  return html
-    .replaceAll(/<[^>]*>/g, "") // Remove all HTML tags
-    .replaceAll("&nbsp;", " ") // Replace space entities
-    .replaceAll(/&#(\d+);/g, (_match, dec) => String.fromCodePoint(dec)) // Handle numeric HTML entities
-    .replaceAll(/&([a-z]+);/g, (_match, entity) => {
-      // Handle named HTML entities
-      const entities = {
-        amp: "&",
-        lt: "<",
-        gt: ">",
-        quot: '"',
-        apos: "'",
-      }
-      return entities[entity] || ""
-    })
-    .trim()
-}
-
 const ArticleCard = ({ entry, handleEntryClick, children }) => {
   const {
-    coverDisplayMode,
     enableContextMenu,
     markReadOnScroll,
     showDetailedRelativeTime,
@@ -90,10 +41,6 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
     handleToggleStatus,
     handleOpenLinkExternally,
   } = useEntryActions()
-
-  const [hasError, setHasError] = useState(false)
-  const [isWideImage, setIsWideImage] = useState(false)
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const wasVisible = useRef(false)
   const cardRef = useRef(null)
@@ -137,66 +84,7 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
         observer.unobserve(element)
       }
     }
-  }, [entry, markReadOnScroll, infoFrom, isUnread, isImageLoaded, isWideImage])
-
-  useEffect(() => {
-    let isSubscribed = true
-
-    if (entry.coverSource) {
-      const img = new Image()
-      img.src = entry.coverSource
-
-      const handleLoad = () => {
-        if (isSubscribed) {
-          const aspectRatio = img.naturalWidth / img.naturalHeight
-          const isThumbnailSize = Math.max(img.width, img.height) <= 250
-
-          // Determine image display mode based on user settings
-          switch (coverDisplayMode) {
-            case "auto": {
-              setIsWideImage(aspectRatio >= WIDE_IMAGE_RATIO && !isThumbnailSize)
-              break
-            }
-            case "banner": {
-              setIsWideImage(true)
-              break
-            }
-            case "thumbnail": {
-              setIsWideImage(false)
-              break
-            }
-            // No default
-          }
-
-          setIsImageLoaded(true)
-        }
-      }
-
-      img.addEventListener("load", handleLoad)
-
-      const handleError = () => {
-        if (isSubscribed) {
-          setHasError(true)
-        }
-      }
-
-      img.addEventListener("error", handleError)
-
-      return () => {
-        isSubscribed = false
-        img.src = ""
-        img.removeEventListener("load", handleLoad)
-        img.removeEventListener("error", handleError)
-      }
-    }
-  }, [entry.coverSource, coverDisplayMode])
-
-  const getLineClamp = () => {
-    const hasSideImage = entry.coverSource && !hasError && !isWideImage
-    return !showEstimatedReadingTime && hasSideImage ? 4 : 3
-  }
-
-  const previewContent = useMemo(() => extractTextFromHtml(entry.content), [entry.content])
+  }, [entry, markReadOnScroll, infoFrom, isUnread])
 
   return (
     <Dropdown
@@ -293,12 +181,6 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
             <h3 className="card-title">{entry.title}</h3>
           </div>
 
-          {entry.coverSource && !hasError && isImageLoaded && isWideImage && (
-            <div className="card-image-wide">
-              <ArticleCardImage entry={entry} isWideImage={isWideImage} setHasError={setHasError} />
-            </div>
-          )}
-
           <div className="card-body">
             <div className="card-text">
               {showEstimatedReadingTime && (
@@ -307,22 +189,7 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
                   <span>{generateReadingTime(entry.reading_time)}</span>
                 </div>
               )}
-              <p
-                className="card-preview"
-                style={{ lineClamp: getLineClamp(), WebkitLineClamp: getLineClamp() }}
-              >
-                {previewContent}
-              </p>
             </div>
-            {entry.coverSource && !hasError && isImageLoaded && !isWideImage && (
-              <div className="card-image-mini">
-                <ArticleCardImage
-                  entry={entry}
-                  isWideImage={isWideImage}
-                  setHasError={setHasError}
-                />
-              </div>
-            )}
           </div>
         </div>
         {children}

@@ -5,14 +5,13 @@
   "packageManager": "pnpm@8.12.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node src/scripts/version-info.js && vite build",
     "preview": "pnpm run build && vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prepare": "simple-git-hooks",
-    "prebuild": "node src/scripts/version-info.js",
     "update-fonts": "node scripts/update-fonts.js"
   },
   "dependencies": {

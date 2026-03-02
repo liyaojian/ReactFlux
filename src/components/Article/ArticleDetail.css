@@ -201,6 +201,16 @@
   }
 }
 
+.background-audio-hint {
+  display: block;
+  margin: 8px auto 12px;
+  padding: 8px 10px;
+  border-radius: var(--border-radius-small);
+  background-color: var(--color-fill-2);
+  color: var(--color-text-3);
+  font-size: 0.85rem;
+}
+
 /* 文章内容文本样式 */
 .article-content {
   flex: 1;

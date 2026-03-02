@@ -2,7 +2,7 @@ import { Divider, Tag, Typography } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import ReactHtmlParser, { domToReact } from "html-react-parser"
 import { littlefoot } from "littlefoot"
-import { forwardRef, useEffect, useRef, useState } from "react"
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router"
 import SimpleBar from "simplebar-react"
 import Lightbox from "yet-another-react-lightbox"
@@ -19,6 +19,8 @@ import ImageOverlayButton from "./ImageOverlayButton"
 import CustomLink from "@/components/ui/CustomLink"
 import FadeTransition from "@/components/ui/FadeTransition"
 import PlyrPlayer from "@/components/ui/PlyrPlayer"
+import { requestGlobalTrackSwitch } from "@/hooks/useGlobalMediaPlayer"
+import { polyglotState } from "@/hooks/useLanguage"
 import usePhotoSlider from "@/hooks/usePhotoSlider"
 import useScreenWidth from "@/hooks/useScreenWidth"
 import {
@@ -27,13 +29,15 @@ import {
   setFilterString,
   setFilterType,
 } from "@/store/contentState"
+import { setCandidateTrack } from "@/store/mediaPlayerState"
 import { settingsState } from "@/store/settingsState"
 import { generateReadableDate, generateReadingTime } from "@/utils/date"
 import { extractImageSources } from "@/utils/images"
+import { extractPlayableMediaCandidate } from "@/utils/media"
 import "./ArticleDetail.css"
 import "./littlefoot.css"
 
-const handleLinkWithImage = (node, imageSources, togglePhotoSlider) => {
+const handleLinkWithImage = (node, imageSources, togglePhotoSlider, playerOptions) => {
   const imgNodes = node.children.filter((child) => child.type === "tag" && child.name === "img")
 
   if (imgNodes.length > 0) {
@@ -44,7 +48,7 @@ const handleLinkWithImage = (node, imageSources, togglePhotoSlider) => {
           <div className="image-container">
             {imgNodes.map((imgNode, index) => (
               <div key={`link-img-${index}`}>
-                {handleImage(imgNode, imageSources, togglePhotoSlider)}
+                {handleImage(imgNode, imageSources, togglePhotoSlider, playerOptions)}
               </div>
             ))}
             <ImageLinkTag href={node.attribs.href} />
@@ -67,19 +71,19 @@ const handleLinkWithImage = (node, imageSources, togglePhotoSlider) => {
   return node
 }
 
-const handleBskyVideo = (node) => {
+const handleBskyVideo = (node, playerOptions) => {
   const isBskyVideo = /video\.bsky\.app.*thumbnail\.jpg$/.test(node.attribs.src)
   if (isBskyVideo) {
     const thumbnailUrl = node.attribs.src
     const playlistUrl = thumbnailUrl.replace("thumbnail.jpg", "playlist.m3u8")
 
-    return <PlyrPlayer poster={thumbnailUrl} src={playlistUrl} />
+    return <PlyrPlayer poster={thumbnailUrl} src={playlistUrl} {...playerOptions} />
   }
   return null
 }
 
-const handleImage = (node, imageSources, togglePhotoSlider) => {
-  const bskyVideoPlayer = handleBskyVideo(node)
+const handleImage = (node, imageSources, togglePhotoSlider, playerOptions) => {
+  const bskyVideoPlayer = handleBskyVideo(node, playerOptions)
   if (bskyVideoPlayer) {
     return bskyVideoPlayer
   }
@@ -196,7 +200,7 @@ const processFigcaptionContent = (children) => {
   })
 }
 
-const handleFigure = (node, imageSources, togglePhotoSlider, options) => {
+const handleFigure = (node, imageSources, togglePhotoSlider, options, playerOptions) => {
   const firstChild = node.children[0]
   const hasImages = node.children.some((child) => child.name === "img")
 
@@ -220,7 +224,7 @@ const handleFigure = (node, imageSources, togglePhotoSlider, options) => {
           if (child.name === "img") {
             return (
               <div key={`figure-img-${index}`}>
-                {handleImage(child, imageSources, togglePhotoSlider)}
+                {handleImage(child, imageSources, togglePhotoSlider, playerOptions)}
               </div>
             )
           }
@@ -264,7 +268,7 @@ const handleCodeBlock = (node) => {
   return <CodeBlock>{codeContent}</CodeBlock>
 }
 
-const handleVideo = (node) => {
+const handleVideo = (node, playerOptions) => {
   const sourceNode = node.children?.find((child) => child.name === "source" && child.attribs?.src)
 
   const videoSrc = sourceNode?.attribs.src || node.attribs.src
@@ -274,7 +278,12 @@ const handleVideo = (node) => {
   }
 
   return (
-    <PlyrPlayer poster={node.attribs.poster} sourceType={sourceNode?.attribs.type} src={videoSrc} />
+    <PlyrPlayer
+      poster={node.attribs.poster}
+      sourceType={sourceNode?.attribs.type}
+      src={videoSrc}
+      {...playerOptions}
+    />
   )
 }
 
@@ -494,7 +503,7 @@ const handleIframe = (node) => {
 
 const BLOCKED_CONTENT_TAGS = new Set(["script", "style", "link", "meta", "head", "html", "body"])
 
-const getHtmlParserOptions = (imageSources, togglePhotoSlider) => {
+const getHtmlParserOptions = (imageSources, togglePhotoSlider, playerOptions) => {
   const options = {
     replace: (node) => {
       if (node.type !== "tag") {
@@ -513,20 +522,20 @@ const getHtmlParserOptions = (imageSources, togglePhotoSlider) => {
       switch (node.name) {
         case "a": {
           return node.children.length > 0
-            ? handleLinkWithImage(node, imageSources, togglePhotoSlider)
+            ? handleLinkWithImage(node, imageSources, togglePhotoSlider, playerOptions)
             : node
         }
         case "img": {
-          return handleImage(node, imageSources, togglePhotoSlider)
+          return handleImage(node, imageSources, togglePhotoSlider, playerOptions)
         }
         case "pre": {
           return handleCodeBlock(node)
         }
         case "figure": {
-          return handleFigure(node, imageSources, togglePhotoSlider, options)
+          return handleFigure(node, imageSources, togglePhotoSlider, options, playerOptions)
         }
         case "video": {
-          return handleVideo(node)
+          return handleVideo(node, playerOptions)
         }
         case "iframe": {
           return handleIframe(node)
@@ -548,6 +557,7 @@ const ArticleDetail = forwardRef((_, ref) => {
   const { isBelowMedium } = useScreenWidth()
 
   const { activeContent } = useStore(contentState)
+  const { polyglot } = useStore(polyglotState)
   const {
     articleWidth,
     edgeToEdgeImages,
@@ -579,17 +589,46 @@ const ArticleDetail = forwardRef((_, ref) => {
   }
 
   const imageSources = extractImageSources(activeContent.content)
-  const htmlParserOptions = getHtmlParserOptions(imageSources, togglePhotoSlider)
+  const { coverSource, mediaPlayerEnclosure, isMedia } = activeContent
+  const mediaCandidateInfo = useMemo(
+    () => extractPlayableMediaCandidate(activeContent),
+    [activeContent],
+  )
 
+  const handleBackgroundPlay = (snapshot) => {
+    if (!snapshot?.src) {
+      return
+    }
+
+    const track = {
+      ...snapshot,
+      entryId: activeContent.id,
+      poster: snapshot.poster || coverSource || "",
+      title: snapshot.title || activeContent.title || "",
+    }
+
+    setCandidateTrack(track)
+    requestGlobalTrackSwitch(track, { autoplay: true, startTime: track.currentTime })
+  }
+
+  const playerOptions = {
+    entryId: activeContent.id,
+    mediaTitle: activeContent.title || "",
+    onBackgroundPlay: handleBackgroundPlay,
+    showBackgroundAction: true,
+  }
+  const htmlParserOptions = getHtmlParserOptions(imageSources, togglePhotoSlider, playerOptions)
   const parsedHtml = ReactHtmlParser(activeContent.content, htmlParserOptions)
   const hasIframeTag = /<iframe[\s>]/i.test(activeContent.content || "")
   const bilibiliLinkInfo = parseBilibiliVideoUrl(activeContent.url)
   const fallbackBilibiliSrc =
     !hasIframeTag && bilibiliLinkInfo ? buildBilibiliEmbedSrc(bilibiliLinkInfo) : ""
+  const isBackgroundAudioUnsupported =
+    mediaCandidateInfo.reason === "iframe-only" ||
+    (Boolean(fallbackBilibiliSrc) && !mediaCandidateInfo.candidate)
   const { id: categoryId, title: categoryTitle } = activeContent.feed.category
   const { id: feedId, title: feedTitle } = activeContent.feed
 
-  const { coverSource, mediaPlayerEnclosure, isMedia } = activeContent
   const normalizedFontSize = Math.min(1.25, Math.max(0.75, Number(fontSize) || 1.05))
 
   const getResponsiveMaxWidth = () => {
@@ -614,6 +653,16 @@ const ArticleDetail = forwardRef((_, ref) => {
       scrollElement?.focus()
     }
   }, [activeContent.id])
+
+  useEffect(() => {
+    setCandidateTrack(mediaCandidateInfo.candidate)
+  }, [mediaCandidateInfo.candidate])
+
+  useEffect(() => {
+    return () => {
+      setCandidateTrack(null)
+    }
+  }, [])
 
   return (
     <article
@@ -676,14 +725,23 @@ const ArticleDetail = forwardRef((_, ref) => {
               "--article-width": articleWidth,
             }}
           >
+            {isBackgroundAudioUnsupported && (
+              <Typography.Text className="background-audio-hint">
+                {polyglot?.t("background_audio_iframe_not_supported")}
+              </Typography.Text>
+            )}
             {isMedia && mediaPlayerEnclosure && (
               <PlyrPlayer
                 enclosure={mediaPlayerEnclosure}
+                entryId={activeContent.id}
+                mediaTitle={activeContent.title || ""}
                 poster={coverSource}
+                showBackgroundAction={true}
                 src={mediaPlayerEnclosure.url}
                 style={{
                   maxWidth: mediaPlayerEnclosure.mime_type.startsWith("video/") ? "100%" : "400px",
                 }}
+                onBackgroundPlay={handleBackgroundPlay}
               />
             )}
             {fallbackBilibiliSrc && (

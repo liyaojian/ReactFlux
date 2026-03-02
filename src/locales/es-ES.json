@@ -327,5 +327,18 @@
     "minutes": "%{smart_count} minuto |||| %{smart_count} minutos",
     "in_time": "en %{time}",
     "time_ago": "hace %{time}"
-  }
+  },
+  "background_audio_close": "Cerrar",
+  "background_audio_error": "La reproducción de audio en segundo plano falló.",
+  "background_audio_iframe_not_supported": "El audio en segundo plano no está disponible para medios iframe incrustados.",
+  "background_audio_mute": "Silenciar",
+  "background_audio_pause": "Pausar",
+  "background_audio_play": "Reproducir",
+  "background_audio_restored": "Se restauró la posición de reproducción. Pulsa reproducir para continuar.",
+  "background_audio_speed": "Velocidad",
+  "background_audio_start": "Reproducir en segundo plano",
+  "background_audio_switch_to_current": "Cambiar al medio del artículo actual",
+  "background_audio_unknown_title": "Audio en segundo plano",
+  "background_audio_unmute": "Activar sonido",
+  "background_audio_volume": "Volumen"
 }

@@ -327,5 +327,18 @@
     "minutes": "%{smart_count} Minute |||| %{smart_count} Minuten",
     "in_time": "in %{time}",
     "time_ago": "vor %{time}"
-  }
+  },
+  "background_audio_close": "Schließen",
+  "background_audio_error": "Hintergrund-Audio konnte nicht abgespielt werden.",
+  "background_audio_iframe_not_supported": "Hintergrund-Audio wird für eingebettete iframe-Medien nicht unterstützt.",
+  "background_audio_mute": "Stumm",
+  "background_audio_pause": "Pause",
+  "background_audio_play": "Wiedergabe",
+  "background_audio_restored": "Die letzte Wiedergabeposition wurde wiederhergestellt. Zum Fortsetzen auf Wiedergabe klicken.",
+  "background_audio_speed": "Geschwindigkeit",
+  "background_audio_start": "Im Hintergrund abspielen",
+  "background_audio_switch_to_current": "Zu aktuellem Artikelmedium wechseln",
+  "background_audio_unknown_title": "Hintergrund-Audio",
+  "background_audio_unmute": "Ton an",
+  "background_audio_volume": "Lautstärke"
 }

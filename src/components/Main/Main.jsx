@@ -6,6 +6,7 @@ import { Outlet, useLocation, useNavigate } from "react-router"
 import { addFeed } from "@/apis"
 import { ContextProvider } from "@/components/Content/ContentContext"
 import SettingsTabs from "@/components/Settings/SettingsTabs"
+import GlobalAudioBar from "@/components/ui/GlobalAudioBar"
 import useAppData from "@/hooks/useAppData"
 import { polyglotState } from "@/hooks/useLanguage"
 import useModalToggle from "@/hooks/useModalToggle"
@@ -175,6 +176,7 @@ const Main = () => (
     <ContextProvider>
       <Outlet />
     </ContextProvider>
+    <GlobalAudioBar />
     <SettingsModal />
     <AddFeedModal />
   </div>

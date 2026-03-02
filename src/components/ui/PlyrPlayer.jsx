@@ -1,7 +1,9 @@
+import { Button } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import { useEffect, useRef } from "react"
 
 import { saveEnclosureProgression } from "@/apis"
+import { polyglotState } from "@/hooks/useLanguage"
 import { contentState } from "@/store/contentState"
 import "plyr/dist/plyr.css"
 import "./PlyrPlayer.css"
@@ -98,15 +100,41 @@ const PlyrPlayer = ({
   poster = "",
   style = {},
   enclosure = null,
+  entryId = null,
+  mediaTitle = "",
+  onBackgroundPlay = () => {},
+  onPlaybackSnapshot = () => {},
   onPlayerInit = () => {},
   onError = () => {},
+  showBackgroundAction = false,
 }) => {
   const { activeContent } = useStore(contentState)
+  const { polyglot } = useStore(polyglotState)
 
   const mediaRef = useRef(null)
   const playerRef = useRef(null)
   const hlsRef = useRef(null)
   const lastSavedTimeRef = useRef(0)
+
+  const getPlaybackSnapshot = () => {
+    if (!playerRef.current) {
+      return null
+    }
+
+    const currentTime = Math.max(0, Number(playerRef.current.currentTime) || 0)
+    const duration = Math.max(0, Number(playerRef.current.duration) || 0)
+    const snapshot = {
+      currentTime,
+      duration,
+      entryId: Number.isFinite(Number(entryId)) ? Number(entryId) : null,
+      mimeType: getMimeType(src, sourceType),
+      poster,
+      src,
+      title: mediaTitle || activeContent?.title || "",
+    }
+
+    return snapshot
+  }
 
   useEffect(() => {
     if (!src || !activeContent) {
@@ -130,6 +158,18 @@ const PlyrPlayer = ({
         } else {
           mediaRef.current.src = src
         }
+
+        const emitPlaybackSnapshot = () => {
+          const snapshot = getPlaybackSnapshot()
+          if (snapshot) {
+            onPlaybackSnapshot(snapshot)
+          }
+        }
+
+        playerRef.current.on("loadeddata", emitPlaybackSnapshot)
+        playerRef.current.on("timeupdate", emitPlaybackSnapshot)
+        playerRef.current.on("pause", emitPlaybackSnapshot)
+        playerRef.current.on("ended", emitPlaybackSnapshot)
 
         if (enclosure) {
           playerRef.current.on("loadeddata", () => {
@@ -193,7 +233,30 @@ const PlyrPlayer = ({
     )
   }
 
-  return <div style={{ ...style, margin: "0 auto" }}>{renderMedia()}</div>
+  return (
+    <div style={{ ...style, margin: "0 auto" }}>
+      {renderMedia()}
+      {showBackgroundAction && (
+        <div className="plyr-background-action">
+          <Button
+            size="mini"
+            type="outline"
+            onClick={() => {
+              const snapshot = getPlaybackSnapshot()
+              if (!snapshot) {
+                return
+              }
+
+              onBackgroundPlay(snapshot)
+              playerRef.current?.pause()
+            }}
+          >
+            {polyglot?.t("background_audio_start") || "Background play"}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default PlyrPlayer

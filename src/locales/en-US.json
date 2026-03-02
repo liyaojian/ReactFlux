@@ -327,5 +327,18 @@
     "minutes": "%{smart_count} minute |||| %{smart_count} minutes",
     "in_time": "in %{time}",
     "time_ago": "%{time} ago"
-  }
+  },
+  "background_audio_close": "Close",
+  "background_audio_error": "Background audio playback failed.",
+  "background_audio_iframe_not_supported": "Background audio is not available for embedded iframe media.",
+  "background_audio_mute": "Mute",
+  "background_audio_pause": "Pause",
+  "background_audio_play": "Play",
+  "background_audio_restored": "Playback position restored. Press play to continue.",
+  "background_audio_speed": "Speed",
+  "background_audio_start": "Play in background",
+  "background_audio_switch_to_current": "Switch to current article media",
+  "background_audio_unknown_title": "Background audio",
+  "background_audio_unmute": "Unmute",
+  "background_audio_volume": "Volume"
 }

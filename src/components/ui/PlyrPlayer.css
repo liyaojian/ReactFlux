@@ -20,3 +20,9 @@
 .plyr__volume input[data-plyr="volume"]:hover {
   display: block;
 }
+
+.plyr-background-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

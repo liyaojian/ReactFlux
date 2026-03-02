@@ -327,5 +327,18 @@
     "minutes": "%{smart_count} minute |||| %{smart_count} minutes",
     "in_time": "dans %{time}",
     "time_ago": "il y a %{time}"
-  }
+  },
+  "background_audio_close": "Fermer",
+  "background_audio_error": "La lecture audio en arrière-plan a échoué.",
+  "background_audio_iframe_not_supported": "L'audio en arrière-plan n'est pas disponible pour les médias iframe intégrés.",
+  "background_audio_mute": "Muet",
+  "background_audio_pause": "Pause",
+  "background_audio_play": "Lire",
+  "background_audio_restored": "La position de lecture a été restaurée. Appuyez sur lire pour continuer.",
+  "background_audio_speed": "Vitesse",
+  "background_audio_start": "Lire en arrière-plan",
+  "background_audio_switch_to_current": "Basculer vers le média de l'article actuel",
+  "background_audio_unknown_title": "Audio en arrière-plan",
+  "background_audio_unmute": "Activer le son",
+  "background_audio_volume": "Volume"
 }

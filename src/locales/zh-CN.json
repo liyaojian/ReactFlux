@@ -327,5 +327,18 @@
     "minutes": "%{smart_count} 分钟",
     "in_time": "%{time}内",
     "time_ago": "%{time}前"
-  }
+  },
+  "background_audio_close": "关闭",
+  "background_audio_error": "后台音频播放失败。",
+  "background_audio_iframe_not_supported": "当前嵌入式 iframe 媒体暂不支持后台音频。",
+  "background_audio_mute": "静音",
+  "background_audio_pause": "暂停",
+  "background_audio_play": "播放",
+  "background_audio_restored": "已恢复上次播放位置，点击播放继续。",
+  "background_audio_speed": "倍速",
+  "background_audio_start": "后台播放",
+  "background_audio_switch_to_current": "切换到当前文章媒体",
+  "background_audio_unknown_title": "后台音频",
+  "background_audio_unmute": "取消静音",
+  "background_audio_volume": "音量"
 }

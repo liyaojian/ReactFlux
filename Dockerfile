@@ -5,8 +5,8 @@ FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 # Install git
 RUN apk add --no-cache git
 
-# enable corepack to use pnpm
-RUN corepack enable
+# enable corepack and pin pnpm to match lockfile format
+RUN corepack enable && corepack prepare pnpm@8.12.0 --activate
 
 # Set the working directory in the container
 WORKDIR /app

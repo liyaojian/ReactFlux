@@ -38,7 +38,11 @@ const useLoadMore = () => {
     return buildFilterParams(referenceEntry)
   }
 
-  const sortProperty = ["starred", "history"].includes(infoFrom) ? "changed_at" : orderBy
+  const sortProperty = ["starred", "history"].includes(infoFrom)
+    ? "changed_at"
+    : orderBy === "created_at"
+      ? "published_at"
+      : orderBy
 
   const getReferenceEntry = () => {
     const sortedEntries = [...entries].toSorted((a, b) => {

@@ -24,6 +24,11 @@ export const getOriginalContent = async (entryId) => {
 export const saveToThirdPartyServices = async (entryId) =>
   apiClient.raw(`/v1/entries/${entryId}/save`, { method: "POST" })
 
+const getEntryOrderField = () => {
+  const orderBy = getSettings("orderBy")
+  return orderBy === "created_at" ? "published_at" : orderBy
+}
+
 const addTimeRangeParams = (queryParams, afterParam, beforeParam, filterDate) => {
   if (!queryParams.get(afterParam)) {
     queryParams.append(afterParam, getTimestamp(filterDate))
@@ -65,13 +70,12 @@ export const buildEntriesUrl = (baseParams, extraParams = {}) => {
 }
 
 export const getAllEntries = async (status = null, filterParams = {}) => {
-  const orderBy = getSettings("orderBy")
   const pageSize = getSettings("pageSize")
   const showHiddenFeeds = getSettings("showHiddenFeeds")
 
   const baseParams = {
     baseUrl: "/v1/entries",
-    orderField: orderBy,
+    orderField: getEntryOrderField(),
     limit: pageSize,
     status,
   }
@@ -85,14 +89,13 @@ export const getAllEntries = async (status = null, filterParams = {}) => {
 }
 
 export const getTodayEntries = async (status = null, filterParams = {}) => {
-  const orderBy = getSettings("orderBy")
   const pageSize = getSettings("pageSize")
   const showHiddenFeeds = getSettings("showHiddenFeeds")
   const timestamp = get24HoursAgoTimestamp()
 
   const baseParams = {
     baseUrl: "/v1/entries",
-    orderField: orderBy,
+    orderField: getEntryOrderField(),
     limit: pageSize,
     status,
   }
@@ -145,13 +148,12 @@ export const getCategoryEntries = async (
   starred = false,
   filterParams = {},
 ) => {
-  const orderBy = getSettings("orderBy")
   const pageSize = getSettings("pageSize")
   const showHiddenFeeds = getSettings("showHiddenFeeds")
 
   const baseParams = {
     baseUrl: `/v1/categories/${categoryId}/entries`,
-    orderField: orderBy,
+    orderField: getEntryOrderField(),
     limit: pageSize,
     status,
   }
@@ -169,12 +171,11 @@ export const getCategoryEntries = async (
 }
 
 export const getFeedEntries = async (feedId, status = null, starred = false, filterParams = {}) => {
-  const orderBy = getSettings("orderBy")
   const pageSize = getSettings("pageSize")
 
   const baseParams = {
     baseUrl: `/v1/feeds/${feedId}/entries`,
-    orderField: orderBy,
+    orderField: getEntryOrderField(),
     limit: pageSize,
     status,
   }

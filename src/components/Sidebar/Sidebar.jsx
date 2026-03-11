@@ -339,7 +339,7 @@ const FeedMenuGroup = ({
   onMarkAllAsRead,
   onDeleteFeed,
 }) => {
-  const { showUnreadFeedsOnly, compactSidebarGroups } = useStore(settingsState)
+  const { showUnreadFeedsOnly } = useStore(settingsState)
   const feedsGroupedById = useStore(feedsGroupedByIdState)
 
   const parentRef = useRef(null)
@@ -356,7 +356,6 @@ const FeedMenuGroup = ({
   return (
     <SimpleBar
       ref={parentRef}
-      style={compactSidebarGroups ? { maxHeight: 400 } : {}}
       scrollableNodeProps={{
         ref: scrollableNodeRef,
         style: { minHeight: "40px" },

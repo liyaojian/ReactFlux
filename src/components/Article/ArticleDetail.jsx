@@ -758,10 +758,10 @@ const ArticleDetail = forwardRef((_, ref) => {
               {aiSummary && (
                 <Alert
                   closable
-                  content={aiSummary}
                   style={{ marginTop: "10px", textAlign: "left" }}
-                  title="AI Summary"
+                  title={<span style={{ fontSize: "1.2rem", fontWeight: 600 }}>✨ AI Summary</span>}
                   type="info"
+                  content={<div style={{ fontSize: "1.1rem", lineHeight: 1.6 }}>{aiSummary}</div>}
                   onClose={() => setAiSummary("")}
                 />
               )}
@@ -769,8 +769,8 @@ const ArticleDetail = forwardRef((_, ref) => {
                 <Alert
                   closable
                   content={aiSummaryError}
-                  style={{ marginTop: "10px", textAlign: "left" }}
-                  title="Error"
+                  style={{ marginTop: "10px", textAlign: "left", fontSize: "1.1rem" }}
+                  title={<span style={{ fontSize: "1.2rem", fontWeight: 600 }}>Error</span>}
                   type="error"
                   onClose={() => setAiSummaryError("")}
                 />

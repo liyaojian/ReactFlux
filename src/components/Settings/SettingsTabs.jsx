@@ -3,12 +3,14 @@ import {
   IconCommand,
   IconFile,
   IconFolder,
+  IconRobot,
   IconSkin,
   IconStorage,
 } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
 import SimpleBar from "simplebar-react"
 
+import AiSettings from "./AiSettings"
 import Appearance from "./Appearance"
 import CategoryList from "./CategoryList"
 import FeedList from "./FeedList"
@@ -97,9 +99,20 @@ const SettingsTabs = ({ activeTab, onTabChange }) => {
         >
           <Appearance />
         </Tabs.TabPane>
+        <Tabs.TabPane
+          key="5"
+          title={
+            <CustomTabTitle
+              icon={<IconRobot style={{ fontSize: "20px" }} />}
+              title={polyglot.t("settings.ai_settings")}
+            />
+          }
+        >
+          <AiSettings />
+        </Tabs.TabPane>
         {!isBelowMedium && (
           <Tabs.TabPane
-            key="5"
+            key="6"
             title={
               <CustomTabTitle
                 icon={<IconCommand style={{ fontSize: "20px" }} />}

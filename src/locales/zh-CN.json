@@ -103,7 +103,11 @@
     "fetch_original_tooltip": "获取原文",
     "save_to_third_party_services_tooltip": "保存到第三方服务",
     "share_tooltip": "分享",
-    "view_comments_tooltip": "查看评论"
+    "view_comments_tooltip": "查看评论",
+    "generate_ai_summary": "✨ 生成 AI 总结",
+    "ai_summary_loading": "正在生成总结...",
+    "ai_summary_configure_missing": "请先在设置中配置 OpenAI 参数",
+    "ai_summary_error": "生成 AI 总结失败：%{error}"
   },
   "article_list": {
     "sort_direction_desc": "最新优先",
@@ -270,7 +274,14 @@
     "swipe_sensitivity_description": "调整滑动手势的灵敏度",
     "swipe_sensitivity_label": "滑动灵敏度",
     "update_content_on_fetch_label": "获取原文时自动保存",
-    "update_content_on_fetch_description": "获取原文时自动更新并保存到数据库"
+    "update_content_on_fetch_description": "获取原文时自动更新并保存到数据库",
+    "ai_settings": "AI 设置",
+    "openai_base_url_label": "OpenAI Base URL",
+    "openai_base_url_description": "OpenAI 兼容接口的 Base URL，例如 https://api.openai.com",
+    "openai_api_key_label": "OpenAI API Key",
+    "openai_api_key_description": "您用于调用 AI 接口的凭证 (API Key)",
+    "openai_model_label": "模型",
+    "openai_model_description": "所使用的模型，默认为 gpt-4o-mini"
   },
   "appearance": {
     "theme_color_label": "主题颜色",

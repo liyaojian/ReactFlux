@@ -1,4 +1,4 @@
-import { Divider, Tag, Typography } from "@arco-design/web-react"
+import { Alert, Button, Divider, Message, Spin, Tag, Typography } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import ReactHtmlParser, { domToReact } from "html-react-parser"
 import { littlefoot } from "littlefoot"
@@ -31,6 +31,7 @@ import {
 } from "@/store/contentState"
 import { setCandidateTrack } from "@/store/mediaPlayerState"
 import { settingsState } from "@/store/settingsState"
+import { fetchAISummary, stripHtmlAndGetText } from "@/utils/ai"
 import { generateReadableDate, generateReadingTime } from "@/utils/date"
 import { extractImageSources } from "@/utils/images"
 import { extractPlayableMediaCandidate } from "@/utils/media"
@@ -579,6 +580,37 @@ const ArticleDetail = forwardRef((_, ref) => {
     }
   }
 
+  const [aiSummary, setAiSummary] = useState("")
+  const [isSummarizing, setIsSummarizing] = useState(false)
+  const [aiSummaryError, setAiSummaryError] = useState("")
+
+  const handleGenerateSummary = async () => {
+    if (!settingsState.get().openaiApiKey) {
+      Message.warning(
+        polyglot?.t("article_card.ai_summary_configure_missing") || "请先在设置中配置 OpenAI 参数",
+      )
+      return
+    }
+
+    setIsSummarizing(true)
+    setAiSummaryError("")
+    try {
+      const text = stripHtmlAndGetText(activeContent.content)
+      const result = await fetchAISummary(text, settingsState.get())
+      setAiSummary(result)
+    } catch (error) {
+      setAiSummaryError(error.message)
+      Message.error(
+        (polyglot?.t("article_card.ai_summary_error") || "生成 AI 总结失败：%{error}").replace(
+          "%{error}",
+          error.message,
+        ),
+      )
+    } finally {
+      setIsSummarizing(false)
+    }
+  }
+
   const togglePhotoSlider = (index) => {
     setSelectedIndex(index)
     setIsPhotoSliderVisible((prev) => !prev)
@@ -713,6 +745,38 @@ const ArticleDetail = forwardRef((_, ref) => {
             <Typography.Text className="article-date">
               {generateReadingTime(activeContent.reading_time)}
             </Typography.Text>
+
+            <div style={{ marginTop: "16px" }}>
+              {!aiSummary && !isSummarizing && (
+                <Button size="small" type="outline" onClick={handleGenerateSummary}>
+                  {polyglot?.t("article_card.generate_ai_summary") || "✨ 生成 AI 总结"}
+                </Button>
+              )}
+              {isSummarizing && (
+                <Spin tip={polyglot?.t("article_card.ai_summary_loading") || "正在生成总结..."} />
+              )}
+              {aiSummary && (
+                <Alert
+                  closable
+                  content={aiSummary}
+                  style={{ marginTop: "10px", textAlign: "left" }}
+                  title="AI Summary"
+                  type="info"
+                  onClose={() => setAiSummary("")}
+                />
+              )}
+              {aiSummaryError && (
+                <Alert
+                  closable
+                  content={aiSummaryError}
+                  style={{ marginTop: "10px", textAlign: "left" }}
+                  title="Error"
+                  type="error"
+                  onClose={() => setAiSummaryError("")}
+                />
+              )}
+            </div>
+
             <Divider />
           </div>
           <div

@@ -101,7 +101,11 @@
     "fetch_original_tooltip": "Récupérer le contenu original",
     "save_to_third_party_services_tooltip": "Sauvegarder dans les services tiers",
     "share_tooltip": "Partager",
-    "view_comments_tooltip": "Voir les commentaires"
+    "view_comments_tooltip": "Voir les commentaires",
+    "generate_ai_summary": "✨ Generate AI Summary",
+    "ai_summary_loading": "Generating summary...",
+    "ai_summary_configure_missing": "Please configure OpenAI parameters in settings first",
+    "ai_summary_error": "Failed to generate AI summary: %{error}"
   },
   "article_list": {
     "sort_direction_desc": "Les plus récents en premier",
@@ -270,7 +274,14 @@
     "swipe_sensitivity_description": "Ajuster la sensibilité des gestes de balayage",
     "swipe_sensitivity_label": "Sensibilité du balayage",
     "update_content_on_fetch_label": "Enregistrer automatiquement le contenu récupéré",
-    "update_content_on_fetch_description": "Mettre à jour et enregistrer automatiquement le contenu récupéré dans la base de données"
+    "update_content_on_fetch_description": "Mettre à jour et enregistrer automatiquement le contenu récupéré dans la base de données",
+    "ai_settings": "AI Settings",
+    "openai_base_url_label": "OpenAI Base URL",
+    "openai_base_url_description": "API Base URL for OpenAI compatible service, e.g. https://api.openai.com",
+    "openai_api_key_label": "OpenAI API Key",
+    "openai_api_key_description": "Your API Key for calling the AI completion interface",
+    "openai_model_label": "Model",
+    "openai_model_description": "The model to be used, defaults to gpt-4o-mini"
   },
   "appearance": {
     "theme_color_label": "Couleur du thème",

@@ -345,13 +345,23 @@ const FeedMenuGroup = ({
   const parentRef = useRef(null)
   const scrollableNodeRef = useRef(null)
 
-  const filteredFeeds = useMemo(
-    () =>
+  const filteredFeeds = useMemo(() => {
+    const feeds =
       feedsGroupedById[categoryId]?.filter(
         (feed) => !showUnreadFeedsOnly || feed.unreadCount > 0,
-      ) || [],
-    [feedsGroupedById, categoryId, showUnreadFeedsOnly],
-  )
+      ) || []
+
+    return feeds
+      .map((feed, index) => ({ feed, index }))
+      .toSorted((itemA, itemB) => {
+        if (itemB.feed.unreadCount !== itemA.feed.unreadCount) {
+          return itemB.feed.unreadCount - itemA.feed.unreadCount
+        }
+
+        return itemA.index - itemB.index
+      })
+      .map(({ feed }) => feed)
+  }, [feedsGroupedById, categoryId, showUnreadFeedsOnly])
 
   return (
     <SimpleBar

@@ -95,6 +95,8 @@
     "next_tooltip": "Next article",
     "mark_as_read_tooltip": "Mark as read",
     "mark_as_unread_tooltip": "Mark as unread",
+    "mark_above_as_read_tooltip": "Mark above as read",
+    "mark_below_as_read_tooltip": "Mark below as read",
     "open_link_externally_tooltip": "Open source link in new page",
     "star_tooltip": "Star",
     "unstar_tooltip": "Unstar",

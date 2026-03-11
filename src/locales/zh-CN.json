@@ -95,6 +95,8 @@
     "next_tooltip": "下一篇文章",
     "mark_as_read_tooltip": "标记为已读",
     "mark_as_unread_tooltip": "标记为未读",
+    "mark_above_as_read_tooltip": "标记以上为已读",
+    "mark_below_as_read_tooltip": "标记以下为已读",
     "open_link_externally_tooltip": "在新页面打开源网页",
     "star_tooltip": "收藏",
     "unstar_tooltip": "取消收藏",

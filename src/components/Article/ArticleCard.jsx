@@ -7,6 +7,8 @@ import {
   IconSave,
   IconStar,
   IconStarFill,
+  IconToBottom,
+  IconToTop,
 } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
 import { useEffect, useRef } from "react"
@@ -14,7 +16,7 @@ import { useEffect, useRef } from "react"
 import FeedIcon from "@/components/ui/FeedIcon"
 import useEntryActions from "@/hooks/useEntryActions"
 import { polyglotState } from "@/hooks/useLanguage"
-import { contentState } from "@/store/contentState"
+import { contentState, filteredEntriesState } from "@/store/contentState"
 import { dataState } from "@/store/dataState"
 import { settingsState } from "@/store/settingsState"
 import { generateReadingTime, generateRelativeTime } from "@/utils/date"
@@ -29,13 +31,24 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
     showFeedIcon,
   } = useStore(settingsState)
   const { activeContent, infoFrom } = useStore(contentState)
+  const filteredEntries = useStore(filteredEntriesState)
   const { hasIntegrations } = useStore(dataState)
   const { polyglot } = useStore(polyglotState)
   const isSelected = activeContent?.id === entry.id
   const isUnread = entry.status === "unread"
   const isStarred = entry.starred
+  const currentEntryIndex = filteredEntries.findIndex((item) => item.id === entry.id)
+  const unreadEntriesAbove =
+    currentEntryIndex > 0
+      ? filteredEntries.slice(0, currentEntryIndex).filter((item) => item.status === "unread")
+      : []
+  const unreadEntriesBelow =
+    currentEntryIndex >= 0
+      ? filteredEntries.slice(currentEntryIndex + 1).filter((item) => item.status === "unread")
+      : []
 
   const {
+    handleMarkEntriesAsRead,
     handleSaveToThirdPartyServices,
     handleToggleStarred,
     handleToggleStatus,
@@ -110,6 +123,28 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
                   : polyglot.t("article_card.mark_as_unread_tooltip")}
               </span>
               {isUnread ? <IconMinusCircle /> : <IconRecord />}
+            </div>
+          </Menu.Item>
+
+          <Menu.Item
+            key="mark-above-as-read"
+            disabled={unreadEntriesAbove.length === 0}
+            onClick={() => handleMarkEntriesAsRead(unreadEntriesAbove)}
+          >
+            <div className="settings-menu-item">
+              <span>{polyglot.t("article_card.mark_above_as_read_tooltip")}</span>
+              <IconToTop />
+            </div>
+          </Menu.Item>
+
+          <Menu.Item
+            key="mark-below-as-read"
+            disabled={unreadEntriesBelow.length === 0}
+            onClick={() => handleMarkEntriesAsRead(unreadEntriesBelow)}
+          >
+            <div className="settings-menu-item">
+              <span>{polyglot.t("article_card.mark_below_as_read_tooltip")}</span>
+              <IconToBottom />
             </div>
           </Menu.Item>
 

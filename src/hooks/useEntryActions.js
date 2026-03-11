@@ -88,6 +88,41 @@ const useEntryActions = () => {
   const { activeContent } = useStore(contentState)
   const { polyglot } = useStore(polyglotState)
 
+  const handleBatchStatusUpdate = async (entries, newStatus) => {
+    const entriesToUpdate = entries.filter((entry) => entry.status !== newStatus)
+    if (entriesToUpdate.length === 0) {
+      return
+    }
+
+    const originalStatusGroups = {}
+    for (const entry of entriesToUpdate) {
+      const { status } = entry
+      if (!originalStatusGroups[status]) {
+        originalStatusGroups[status] = []
+      }
+      originalStatusGroups[status].push(entry)
+    }
+
+    handleEntriesStatusUpdate(entriesToUpdate, newStatus)
+
+    try {
+      await updateEntriesStatus(
+        entriesToUpdate.map((entry) => entry.id),
+        newStatus,
+      )
+    } catch {
+      Message.error(
+        newStatus === "read"
+          ? polyglot.t("actions.mark_as_read_error")
+          : polyglot.t("actions.mark_as_unread_error"),
+      )
+
+      for (const [status, groupedEntries] of Object.entries(originalStatusGroups)) {
+        handleEntriesStatusUpdate(groupedEntries, status)
+      }
+    }
+  }
+
   const handleEntryStarredUpdate = (entry, newStarred) => {
     if (newStarred) {
       setStarredCount((prev) => prev + 1)
@@ -111,16 +146,11 @@ const useEntryActions = () => {
   const handleToggleStatus = async (entry) => {
     const prevStatus = entry.status
     const newStatus = prevStatus === "read" ? "unread" : "read"
-    handleEntryStatusUpdate(entry, newStatus)
+    await handleBatchStatusUpdate([entry], newStatus)
+  }
 
-    updateEntriesStatus([entry.id], newStatus).catch(() => {
-      Message.error(
-        newStatus === "read"
-          ? polyglot.t("actions.mark_as_read_error")
-          : polyglot.t("actions.mark_as_unread_error"),
-      )
-      handleEntryStatusUpdate(entry, prevStatus)
-    })
+  const handleMarkEntriesAsRead = async (entries) => {
+    await handleBatchStatusUpdate(entries, "read")
   }
 
   const handleToggleStarred = async (entry) => {
@@ -172,6 +202,7 @@ const useEntryActions = () => {
   return {
     handleEntryStatusUpdate,
     handleFetchContent,
+    handleMarkEntriesAsRead,
     handleOpenLinkExternally,
     handleSaveToThirdPartyServices,
     handleToggleStarred,

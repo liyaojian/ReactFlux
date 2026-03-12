@@ -253,6 +253,8 @@
     "entries_order_description": "文章的排序方式：",
     "entries_order_option_published_at": "发布时间",
     "entries_order_option_created_at": "创建时间",
+    "sort_sidebar_categories_by_unread_count_label": "左侧分类按未读数排序",
+    "sort_sidebar_categories_by_unread_count_description": "在左侧栏中优先显示未读文章更多的分类",
     "entries_per_page_label": "每页文章数",
     "entries_per_page_description": "每页显示的文章数：",
     "remove_duplicates_label": "删除重复文章",

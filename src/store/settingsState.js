@@ -26,6 +26,7 @@ const defaultValue = {
   showEstimatedReadingTime: false,
   showFeedIcon: true,
   showHiddenFeeds: false,
+  sortSidebarCategoriesByUnreadCount: false,
   showStatus: "unread",
   showUnreadFeedsOnly: false,
   swipeSensitivity: 1,

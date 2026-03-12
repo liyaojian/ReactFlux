@@ -251,6 +251,8 @@
     "entries_order_description": "En qué orden se deben mostrar las entradas:",
     "entries_order_option_published_at": "Publicado en",
     "entries_order_option_created_at": "Actualizado en",
+    "sort_sidebar_categories_by_unread_count_label": "Ordenar categorías laterales por no leídos",
+    "sort_sidebar_categories_by_unread_count_description": "Muestra primero en la barra lateral izquierda las categorías con más artículos no leídos",
     "entries_per_page_label": "Entradas por página",
     "entries_per_page_description": "Cuantas entradas mostrar por página:",
     "remove_duplicates_label": "Eliminar artículos duplicados",

@@ -251,6 +251,8 @@
     "entries_order_description": "Dans quel ordre afficher les entrées :",
     "entries_order_option_published_at": "Date de publication",
     "entries_order_option_created_at": "Date de création",
+    "sort_sidebar_categories_by_unread_count_label": "Trier les catégories latérales par non lus",
+    "sort_sidebar_categories_by_unread_count_description": "Affiche d'abord dans la barre latérale gauche les catégories avec le plus d'articles non lus",
     "entries_per_page_label": "Entrées par page",
     "entries_per_page_description": "Afficher combien d'entrées par page :",
     "remove_duplicates_label": "Supprimer les doublons",

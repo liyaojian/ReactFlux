@@ -251,6 +251,8 @@
     "entries_order_description": "Einträge nach dieser Sortierung anzeigen:",
     "entries_order_option_published_at": "veröffentlicht",
     "entries_order_option_created_at": "aktualisiert",
+    "sort_sidebar_categories_by_unread_count_label": "Seitenleisten-Kategorien nach Ungelesen sortieren",
+    "sort_sidebar_categories_by_unread_count_description": "Zeigt in der linken Seitenleiste zuerst Kategorien mit mehr ungelesenen Artikeln an",
     "entries_per_page_label": "Einträge pro Seite",
     "entries_per_page_description": "So viele Einträge pro Seite anzeigen:",
     "remove_duplicates_label": "Doppelte Einträge entfernen",

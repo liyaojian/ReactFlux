@@ -253,6 +253,8 @@
     "entries_order_description": "What order to show entries:",
     "entries_order_option_published_at": "Published at",
     "entries_order_option_created_at": "Updated at",
+    "sort_sidebar_categories_by_unread_count_label": "Sort sidebar categories by unread count",
+    "sort_sidebar_categories_by_unread_count_description": "Show categories with more unread articles first in the left sidebar",
     "entries_per_page_label": "Entries per page",
     "entries_per_page_description": "Show how many entries per page:",
     "remove_duplicates_label": "Remove duplicate articles",

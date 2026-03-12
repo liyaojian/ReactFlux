@@ -29,6 +29,7 @@ const General = () => {
     orderBy,
     pageSize,
     removeDuplicates,
+    sortSidebarCategoriesByUnreadCount,
     swipeSensitivity,
     updateContentOnFetch,
   } = useStore(settingsState)
@@ -128,6 +129,18 @@ const General = () => {
             {polyglot.t("settings.entries_order_option_created_at")}
           </Select.Option>
         </Select>
+      </SettingItem>
+
+      <Divider />
+
+      <SettingItem
+        description={polyglot.t("settings.sort_sidebar_categories_by_unread_count_description")}
+        title={polyglot.t("settings.sort_sidebar_categories_by_unread_count_label")}
+      >
+        <Switch
+          checked={sortSidebarCategoriesByUnreadCount}
+          onChange={(value) => updateSettings({ sortSidebarCategoriesByUnreadCount: value })}
+        />
       </SettingItem>
 
       <Divider />

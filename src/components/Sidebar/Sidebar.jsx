@@ -397,15 +397,15 @@ const CategoryGroup = ({
   onMarkAllAsReadFeed,
   onDeleteFeed,
 }) => {
-  const { showUnreadFeedsOnly } = useStore(settingsState)
+  const { showUnreadFeedsOnly, sortSidebarCategoriesByUnreadCount } = useStore(settingsState)
   const feedsGroupedById = useStore(feedsGroupedByIdState)
   const filteredCategories = useStore(filteredCategoriesState)
 
   const location = useLocation()
   const currentPath = location.pathname
 
-  return filteredCategories
-    .filter((category) => {
+  const visibleCategories = useMemo(() => {
+    const categories = filteredCategories.filter((category) => {
       const feedsInCategory = feedsGroupedById[category.id]
 
       // If the category does not have a feed
@@ -422,32 +422,54 @@ const CategoryGroup = ({
         return true
       })
     })
-    .map((category) => (
-      <Collapse.Item
-        key={category.id}
-        expandIcon={<IconRight />}
-        name={`/category/${category.id}`}
-        style={{ position: "relative", overflow: "hidden" }}
-        header={
-          <CategoryTitle
-            category={category}
-            path={currentPath}
-            onDeleteCategory={onDeleteCategory}
-            onEditCategory={onEditCategory}
-            onMarkAllAsRead={onMarkAllAsReadCategory}
-            onRefreshCategory={onRefreshCategory}
-          />
+
+    if (!sortSidebarCategoriesByUnreadCount) {
+      return categories
+    }
+
+    return categories
+      .map((category, index) => ({ category, index }))
+      .toSorted((itemA, itemB) => {
+        if (itemB.category.unreadCount !== itemA.category.unreadCount) {
+          return itemB.category.unreadCount - itemA.category.unreadCount
         }
-      >
-        <FeedMenuGroup
-          categoryId={category.id}
-          onDeleteFeed={onDeleteFeed}
-          onEditFeed={onEditFeed}
-          onMarkAllAsRead={onMarkAllAsReadFeed}
-          onRefreshFeed={onRefreshFeed}
+
+        return itemA.index - itemB.index
+      })
+      .map(({ category }) => category)
+  }, [
+    feedsGroupedById,
+    filteredCategories,
+    showUnreadFeedsOnly,
+    sortSidebarCategoriesByUnreadCount,
+  ])
+
+  return visibleCategories.map((category) => (
+    <Collapse.Item
+      key={category.id}
+      expandIcon={<IconRight />}
+      name={`/category/${category.id}`}
+      style={{ position: "relative", overflow: "hidden" }}
+      header={
+        <CategoryTitle
+          category={category}
+          path={currentPath}
+          onDeleteCategory={onDeleteCategory}
+          onEditCategory={onEditCategory}
+          onMarkAllAsRead={onMarkAllAsReadCategory}
+          onRefreshCategory={onRefreshCategory}
         />
-      </Collapse.Item>
-    ))
+      }
+    >
+      <FeedMenuGroup
+        categoryId={category.id}
+        onDeleteFeed={onDeleteFeed}
+        onEditFeed={onEditFeed}
+        onMarkAllAsRead={onMarkAllAsReadFeed}
+        onRefreshFeed={onRefreshFeed}
+      />
+    </Collapse.Item>
+  ))
 }
 
 const readFileAsText = async (file) => {

@@ -14,7 +14,8 @@ import useFeedIconsSync from "./hooks/useFeedIconsSync"
 import useLanguage, { polyglotState } from "./hooks/useLanguage"
 import useScreenWidth from "./hooks/useScreenWidth"
 import useTheme from "./hooks/useTheme"
-import { settingsState } from "./store/settingsState"
+import { contentState } from "./store/contentState"
+import { settingsState, updateSettings } from "./store/settingsState"
 import hideSpinner from "./utils/loading"
 
 const localMap = {
@@ -33,6 +34,7 @@ const App = () => {
 
   const { isBelowLarge } = useScreenWidth()
 
+  const { activeContent } = useStore(contentState)
   const { polyglot } = useStore(polyglotState)
   const { language, layoutFullscreen } = useStore(settingsState)
   const locale = getLocale(language)
@@ -44,6 +46,12 @@ const App = () => {
   useEffect(() => {
     document.body.classList.toggle("article-fullscreen", layoutFullscreen)
   }, [layoutFullscreen])
+
+  useEffect(() => {
+    if (layoutFullscreen && !activeContent) {
+      updateSettings({ layoutFullscreen: false })
+    }
+  }, [layoutFullscreen, activeContent])
 
   return (
     polyglot && (

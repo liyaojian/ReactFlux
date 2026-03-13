@@ -7,6 +7,8 @@ import {
   IconCheck,
   IconClose,
   IconCloudDownload,
+  IconFullscreen,
+  IconFullscreenExit,
   IconLaunch,
   IconMessage,
   IconMinusCircle,
@@ -49,6 +51,7 @@ const DesktopButtons = memo(
         {commonButtons.status}
         {commonButtons.star}
         {commonButtons.fetch}
+        {commonButtons.fullscreen}
         {commonButtons.toc}
         {hasIntegrations && (
           <CustomTooltip
@@ -73,6 +76,7 @@ const MobileButtons = memo(({ commonButtons, hasHeadings }) => (
     {commonButtons.close}
     {commonButtons.next}
     {!hasHeadings && commonButtons.fetch}
+    {commonButtons.fullscreen}
     {commonButtons.toc}
     {commonButtons.more}
   </div>
@@ -91,6 +95,7 @@ const ActionButtons = () => {
     enableSwipeGesture,
     fontSize,
     fontFamily,
+    layoutFullscreen,
     titleAlignment,
   } = useStore(settingsState)
 
@@ -242,6 +247,22 @@ const ActionButtons = () => {
             await handleFetchContent()
             setIsFetchedOriginal(true)
           }}
+        />
+      </CustomTooltip>
+    ),
+    fullscreen: (
+      <CustomTooltip
+        mini
+        content={
+          layoutFullscreen
+            ? polyglot.t("article_card.exit_fullscreen_tooltip") || "退出全屏"
+            : polyglot.t("article_card.fullscreen_tooltip") || "全屏"
+        }
+      >
+        <Button
+          icon={layoutFullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
+          shape="circle"
+          onClick={() => updateSettings({ layoutFullscreen: !layoutFullscreen })}
         />
       </CustomTooltip>
     ),

@@ -34,12 +34,16 @@ const App = () => {
   const { isBelowLarge } = useScreenWidth()
 
   const { polyglot } = useStore(polyglotState)
-  const { language } = useStore(settingsState)
+  const { language, layoutFullscreen } = useStore(settingsState)
   const locale = getLocale(language)
 
   useEffect(() => {
     hideSpinner()
   }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle("article-fullscreen", layoutFullscreen)
+  }, [layoutFullscreen])
 
   return (
     polyglot && (

@@ -234,7 +234,14 @@ const ActionButtons = () => {
     ),
     close: (
       <CustomTooltip mini content={polyglot.t("article_card.close_tooltip")}>
-        <Button icon={<IconClose />} shape="circle" onClick={() => exitDetailView()} />
+        <Button
+          icon={<IconClose />}
+          shape="circle"
+          onClick={() => {
+            exitDetailView()
+            updateSettings({ layoutFullscreen: false })
+          }}
+        />
       </CustomTooltip>
     ),
     fetch: (

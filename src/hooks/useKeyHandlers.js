@@ -13,6 +13,7 @@ import {
   nextContentState,
   prevContentState,
 } from "@/store/contentState"
+import { updateSettings } from "@/store/settingsState"
 import { ANIMATION_DURATION_MS } from "@/utils/constants"
 import { extractImageSources } from "@/utils/images"
 
@@ -71,6 +72,7 @@ const useKeyHandlers = () => {
     // eslint-disable-next-line react-hooks/refs
     withPhotoSliderCheck(() => {
       closeActiveContent()
+      updateSettings({ layoutFullscreen: false })
       if (entryListRef.current) {
         entryListRef.current.contentWrapperEl.focus()
       }

@@ -237,3 +237,14 @@
 .article-content td {
   color: var(--color-text-3);
 }
+
+/* 全屏状态下扩大 iframe 和视频播放器的尺寸 */
+body.article-fullscreen .article-body iframe,
+body.article-fullscreen .article-body .plyr--video {
+  width: 85vw;
+  max-width: 1200px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}

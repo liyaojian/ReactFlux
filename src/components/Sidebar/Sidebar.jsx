@@ -251,8 +251,6 @@ const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDele
   const { showFeedIcon } = useStore(settingsState)
   const { polyglot } = useStore(polyglotState)
 
-  const { isBelowMedium } = useScreenWidth()
-
   const navigate = useNavigate()
   const location = useLocation()
   const isSelected =
@@ -311,7 +309,6 @@ const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDele
         <div className="custom-menu-item">
           <Typography.Ellipsis
             expandable={false}
-            showTooltip={!isBelowMedium}
             style={{
               width: feed.unreadCount ? "80%" : "100%",
               paddingLeft: "20px",

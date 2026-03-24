@@ -1,25 +1,24 @@
 .card-author {
   color: var(--color-text-3);
-  margin-top: -3px;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.card-body {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   will-change: opacity, background-color;
   transform: translateZ(0);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .card-image-mini {
@@ -47,9 +46,9 @@
 .card-meta {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 4px;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .card-preview {
@@ -64,10 +63,16 @@
 .card-reading-time {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   color: var(--color-text-3);
   font-size: 0.75rem;
-  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.card-meta-separator {
+  color: var(--color-text-4);
+  flex: 0 0 auto;
+  font-size: 0.7rem;
 }
 
 .card-source {
@@ -80,23 +85,23 @@
 
 .card-source-content {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .card-source-title {
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card-star {
   margin-top: -2px;
-}
-
-.card-text {
-  flex: 1;
-  min-width: 0;
 }
 
 .card-thumbnail {
@@ -125,12 +130,15 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .card-title {
   color: var(--color-text-2);
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: bold;
+  line-height: 1.4;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -145,7 +153,7 @@
   background-color: transparent;
   cursor: pointer;
   transition: background-color 0.2s;
-  padding: 12px;
+  padding: 10px 12px;
   user-select: none;
   overflow: hidden;
   contain: content;
@@ -163,9 +171,8 @@
 }
 
 .feed-icon-mini {
-  margin-right: 4px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .icon-starred {

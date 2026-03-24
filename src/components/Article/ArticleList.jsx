@@ -92,7 +92,7 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
                 {index < filteredEntries.length - 1 && (
                   <Divider
                     style={{
-                      margin: "8px 0",
+                      margin: "6px 0",
                       borderBottom: "1px solid var(--color-border-2)",
                     }}
                   />

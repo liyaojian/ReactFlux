@@ -1,7 +1,7 @@
 .entry-list {
   flex: 1;
   contain: strict;
-  padding: 10px;
+  padding: 8px;
   height: 100%;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -19,6 +19,6 @@
 
 @media screen and (max-width: 768px) {
   .entry-list {
-    width: calc(100% - 20px);
+    width: calc(100% - 16px);
   }
 }

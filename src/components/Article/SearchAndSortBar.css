@@ -5,13 +5,13 @@
   align-items: center;
   z-index: 2;
   background-color: rgb(var(--color-bg-1));
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .search-and-sort-bar .page-info {
   display: flex;
   align-items: center;
-  margin-left: 12px;
+  margin-left: 8px;
   color: var(--color-text-2);
   white-space: nowrap;
   overflow: hidden;
@@ -31,17 +31,18 @@
 
 .search-and-sort-bar .page-info .count-label {
   color: var(--color-text-4);
-  margin-left: 6px;
+  margin-left: 4px;
   flex: 0 0 auto;
   font-weight: 500;
   display: inline-block;
+  font-size: 0.85rem;
 }
 
 .search-and-sort-bar .button-group {
   display: flex;
   flex: 0 0 auto;
-  gap: 8px;
-  margin: 0 8px;
+  gap: 6px;
+  margin: 0 6px;
 }
 
 .search-and-sort-bar .button-group button {

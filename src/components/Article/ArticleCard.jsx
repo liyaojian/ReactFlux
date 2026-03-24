@@ -195,9 +195,16 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
             <div className="card-meta">
               <div className="card-source">
                 {showFeedIcon && <FeedIcon className="feed-icon-mini" feed={entry.feed} />}
-                <div className="card-source-content">
+                <div className="card-source-content" title={entry.feed.title}>
                   <span className="card-source-title">{entry.feed.title}</span>
-                  <span className="card-author">{entry.author}</span>
+                  {entry.author && (
+                    <>
+                      <span className="card-meta-separator">·</span>
+                      <span className="card-author" title={entry.author}>
+                        {entry.author}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="card-time-wrapper">
@@ -210,21 +217,19 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
                 <span className="card-time">
                   {generateRelativeTime(entry.published_at, showDetailedRelativeTime)}
                 </span>
+                {showEstimatedReadingTime && (
+                  <>
+                    <span className="card-meta-separator">·</span>
+                    <span className="card-reading-time">
+                      <IconClockCircle />
+                      <span>{generateReadingTime(entry.reading_time)}</span>
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
             <h3 className="card-title">{entry.title}</h3>
-          </div>
-
-          <div className="card-body">
-            <div className="card-text">
-              {showEstimatedReadingTime && (
-                <div className="card-reading-time">
-                  <IconClockCircle />
-                  <span>{generateReadingTime(entry.reading_time)}</span>
-                </div>
-              )}
-            </div>
           </div>
         </div>
         {children}

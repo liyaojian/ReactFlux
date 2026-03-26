@@ -47,3 +47,11 @@ export const openInNewTab = (url) => {
   link.click()
   link.remove()
 }
+
+export const openInCurrentTab = (url) => {
+  if (!url) {
+    return
+  }
+
+  globalThis.location.assign(url)
+}

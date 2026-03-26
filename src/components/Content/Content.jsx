@@ -32,6 +32,7 @@ import {
 import { dataState } from "@/store/dataState"
 import { duplicateHotkeysState } from "@/store/hotkeysState"
 import { settingsState } from "@/store/settingsState"
+import { openInCurrentTab } from "@/utils/dom"
 
 import "./Content.css"
 
@@ -115,11 +116,21 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
 
   const handleSwipeLeft = useCallback(() => {
     if (enableSwipeLeftToOpenLink) {
-      openLinkExternally()
+      if (isBelowMedium) {
+        openInCurrentTab(activeContent?.url)
+      } else {
+        openLinkExternally()
+      }
       return
     }
     navigateToNextArticle()
-  }, [enableSwipeLeftToOpenLink, navigateToNextArticle, openLinkExternally])
+  }, [
+    activeContent,
+    enableSwipeLeftToOpenLink,
+    isBelowMedium,
+    navigateToNextArticle,
+    openLinkExternally,
+  ])
 
   const handleSwipeRight = useCallback(() => {
     if (enableSwipeLeftToOpenLink) {

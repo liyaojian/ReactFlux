@@ -31,3 +31,19 @@ export const scrollToHeading = (heading) => {
     }
   }
 }
+
+export const openInNewTab = (url) => {
+  if (!url) {
+    return
+  }
+
+  const link = document.createElement("a")
+  link.href = url
+  link.target = "_blank"
+  link.rel = "noopener noreferrer"
+  link.style.display = "none"
+
+  document.body.append(link)
+  link.click()
+  link.remove()
+}

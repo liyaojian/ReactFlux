@@ -17,6 +17,7 @@ import {
   setUnreadTodayCount,
 } from "@/store/dataState"
 import { checkIsInLast24Hours } from "@/utils/date"
+import { openInNewTab } from "@/utils/dom"
 
 const updateEntries = (entries, updatedEntries) => {
   const updatedEntryIds = new Set(updatedEntries.map((entry) => entry.id))
@@ -81,7 +82,7 @@ const handleEntryStatusUpdate = (entry, newStatus) => {
 }
 
 const handleOpenLinkExternally = (entry) => {
-  window.open(entry.url, "_blank")
+  openInNewTab(entry.url)
 }
 
 const useEntryActions = () => {

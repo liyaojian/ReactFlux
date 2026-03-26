@@ -15,6 +15,7 @@ import {
 } from "@/store/contentState"
 import { updateSettings } from "@/store/settingsState"
 import { ANIMATION_DURATION_MS } from "@/utils/constants"
+import { openInNewTab } from "@/utils/dom"
 import { extractImageSources } from "@/utils/images"
 
 const findAdjacentUnreadEntry = (currentIndex, direction, entries) => {
@@ -120,7 +121,7 @@ const useKeyHandlers = () => {
   const navigateToNextUnreadArticle = () => navigateToAdjacentUnreadArticle("next")
 
   const openLinkExternally = withActiveContent(() => {
-    window.open(activeContent.url, "_blank")
+    openInNewTab(activeContent.url)
   })
 
   const fetchOriginalArticle = withActiveContent((handleFetchContent) => {

@@ -1,5 +1,5 @@
 import { Button, Notification, Typography } from "@arco-design/web-react"
-import { IconEmpty, IconLeft, IconRight } from "@arco-design/web-react/icon"
+import { IconEmpty, IconLaunch, IconLeft, IconRight } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
 import { AnimatePresence } from "framer-motion"
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -39,8 +39,14 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
   const { activeContent, entries, filterDate, filterString, isArticleLoading } =
     useStore(contentState)
   const { isAppDataReady } = useStore(dataState)
-  const { enableSwipeGesture, orderBy, orderDirection, showStatus, swipeSensitivity } =
-    useStore(settingsState)
+  const {
+    enableSwipeGesture,
+    enableSwipeLeftToOpenLink,
+    orderBy,
+    orderDirection,
+    showStatus,
+    swipeSensitivity,
+  } = useStore(settingsState)
   const { polyglot } = useStore(polyglotState)
   const duplicateHotkeys = useStore(duplicateHotkeysState)
 
@@ -55,7 +61,12 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
 
   const { entryDetailRef, entryListRef, handleEntryClick } = useContentContext()
 
-  const { navigateToNextArticle, navigateToPreviousArticle, showHotkeysSettings } = useKeyHandlers()
+  const {
+    navigateToNextArticle,
+    navigateToPreviousArticle,
+    openLinkExternally,
+    showHotkeysSettings,
+  } = useKeyHandlers()
 
   const { fetchAppData, fetchFeedRelatedData } = useAppData()
   const { fetchArticleList } = useArticleList(info, getEntries)
@@ -94,7 +105,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
 
   const handleSwiping = (eventData) => {
     setIsSwipingLeft(eventData.dir === "Left")
-    setIsSwipingRight(eventData.dir === "Right")
+    setIsSwipingRight(!enableSwipeLeftToOpenLink && eventData.dir === "Right")
   }
 
   const handleSwiped = () => {
@@ -102,12 +113,20 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
     setIsSwipingRight(false)
   }
 
-  const handleSwipeLeft = useCallback(() => navigateToNextArticle(), [navigateToNextArticle])
+  const handleSwipeLeft = useCallback(() => {
+    if (enableSwipeLeftToOpenLink) {
+      openLinkExternally()
+      return
+    }
+    navigateToNextArticle()
+  }, [enableSwipeLeftToOpenLink, navigateToNextArticle, openLinkExternally])
 
-  const handleSwipeRight = useCallback(
-    () => navigateToPreviousArticle(),
-    [navigateToPreviousArticle],
-  )
+  const handleSwipeRight = useCallback(() => {
+    if (enableSwipeLeftToOpenLink) {
+      return
+    }
+    navigateToPreviousArticle()
+  }, [enableSwipeLeftToOpenLink, navigateToPreviousArticle])
 
   const handlers = useSwipeable({
     delta: 50 / swipeSensitivity,
@@ -121,7 +140,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
       : undefined,
     onSwiped: enableSwipeGesture ? handleSwiped : undefined,
     onSwipedLeft: enableSwipeGesture ? handleSwipeLeft : undefined,
-    onSwipedRight: enableSwipeGesture ? handleSwipeRight : undefined,
+    onSwipedRight: enableSwipeGesture && !enableSwipeLeftToOpenLink ? handleSwipeRight : undefined,
   })
 
   useEffect(() => {
@@ -237,7 +256,11 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
                 )}
                 {isSwipingLeft && (
                   <FadeTransition key="swipe-hint-right" className="swipe-hint right">
-                    <IconRight style={{ fontSize: 24 }} />
+                    {enableSwipeLeftToOpenLink ? (
+                      <IconLaunch style={{ fontSize: 24 }} />
+                    ) : (
+                      <IconRight style={{ fontSize: 24 }} />
+                    )}
                   </FadeTransition>
                 )}
               </AnimatePresence>

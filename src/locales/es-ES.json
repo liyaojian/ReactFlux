@@ -273,6 +273,8 @@
     "compact_sidebar_groups_description": "Limitar la altura del grupo de feeds para evitar listas de desplazamiento largas (recomendado para rendimiento con muchos feeds)",
     "enable_swipe_gesture_description": "Habilitar gesto de deslizamiento para cambiar artículos",
     "enable_swipe_gesture_label": "Habilitar gesto de deslizamiento",
+    "enable_swipe_left_to_open_link_description": "Usar el deslizamiento hacia la izquierda para abrir el enlace original en una nueva pestaña",
+    "enable_swipe_left_to_open_link_label": "Deslizar a la izquierda abre el enlace original",
     "swipe_sensitivity_description": "Ajustar la sensibilidad de los gestos de deslizamiento",
     "swipe_sensitivity_label": "Sensibilidad de deslizamiento",
     "update_content_on_fetch_label": "Guardar automáticamente el contenido obtenido",

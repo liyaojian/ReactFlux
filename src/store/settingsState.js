@@ -8,6 +8,7 @@ const defaultValue = {
   edgeToEdgeImages: false,
   enableContextMenu: true,
   enableSwipeGesture: true,
+  enableSwipeLeftToOpenLink: false,
   fontFamily: "system-ui",
   fontSize: 1.05,
   homePage: "all",

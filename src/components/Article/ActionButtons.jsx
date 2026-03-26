@@ -93,6 +93,7 @@ const ActionButtons = () => {
     articleWidth,
     edgeToEdgeImages,
     enableSwipeGesture,
+    enableSwipeLeftToOpenLink,
     fontSize,
     fontFamily,
     layoutFullscreen,
@@ -179,7 +180,7 @@ const ActionButtons = () => {
 
   const commonButtons = {
     prev:
-      isBelowMedium && enableSwipeGesture ? undefined : (
+      isBelowMedium && enableSwipeGesture && !enableSwipeLeftToOpenLink ? undefined : (
         <CustomTooltip mini content={polyglot.t("article_card.previous_tooltip")}>
           <Button
             disabled={!prevContent}
@@ -190,7 +191,7 @@ const ActionButtons = () => {
         </CustomTooltip>
       ),
     next:
-      isBelowMedium && enableSwipeGesture ? undefined : (
+      isBelowMedium && enableSwipeGesture && !enableSwipeLeftToOpenLink ? undefined : (
         <CustomTooltip mini content={polyglot.t("article_card.next_tooltip")}>
           <Button
             disabled={!nextContent}

@@ -273,6 +273,8 @@
     "compact_sidebar_groups_description": "Feed-Gruppenhöhe begrenzen, um lange Scroll-Listen zu vermeiden (empfohlen für Leistung bei vielen Feeds)",
     "enable_swipe_gesture_description": "Erlaubt Wischen nach links und rechts zum Navigieren zwischen Artikeln",
     "enable_swipe_gesture_label": "Wischgeste aktivieren",
+    "enable_swipe_left_to_open_link_description": "Wischen nach links, um den Originallink in einem neuen Browser-Tab zu öffnen",
+    "enable_swipe_left_to_open_link_label": "Links wischen öffnet Originallink",
     "swipe_sensitivity_description": "Empfindlichkeit der Wischgesten anpassen",
     "swipe_sensitivity_label": "Wischempfindlichkeit",
     "update_content_on_fetch_label": "Abgerufene Inhalte automatisch speichern",

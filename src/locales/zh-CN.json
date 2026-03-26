@@ -273,6 +273,8 @@
     "enable_context_menu_description": "在文章卡片上启用右键菜单功能",
     "enable_swipe_gesture_description": "启用左右滑动手势来切换文章",
     "enable_swipe_gesture_label": "启用滑动手势",
+    "enable_swipe_left_to_open_link_description": "将左滑手势改为在新标签页打开原始链接",
+    "enable_swipe_left_to_open_link_label": "左滑打开原始链接",
     "swipe_sensitivity_description": "调整滑动手势的灵敏度",
     "swipe_sensitivity_label": "滑动灵敏度",
     "update_content_on_fetch_label": "获取原文时自动保存",

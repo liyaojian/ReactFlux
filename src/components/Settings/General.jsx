@@ -22,6 +22,7 @@ const General = () => {
   const {
     enableContextMenu,
     enableSwipeGesture,
+    enableSwipeLeftToOpenLink,
     homePage,
     language,
     markReadBy,
@@ -252,6 +253,18 @@ const General = () => {
 
           {enableSwipeGesture && (
             <>
+              <Divider />
+
+              <SettingItem
+                description={polyglot.t("settings.enable_swipe_left_to_open_link_description")}
+                title={polyglot.t("settings.enable_swipe_left_to_open_link_label")}
+              >
+                <Switch
+                  checked={enableSwipeLeftToOpenLink}
+                  onChange={(value) => updateSettings({ enableSwipeLeftToOpenLink: value })}
+                />
+              </SettingItem>
+
               <Divider />
 
               <SettingItem

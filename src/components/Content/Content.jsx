@@ -187,7 +187,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
     } else {
       fetchArticleListOnly()
     }
-  }, [info])
+  }, [info.from, info.id])
 
   useEffect(() => {
     if (["starred", "history"].includes(info.from)) {

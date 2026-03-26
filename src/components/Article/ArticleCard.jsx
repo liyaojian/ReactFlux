@@ -37,6 +37,12 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
   const isSelected = activeContent?.id === entry.id
   const isUnread = entry.status === "unread"
   const isStarred = entry.starred
+  const showFeedTitle = infoFrom !== "feed"
+  const showAuthor = Boolean(entry.author)
+  const showSourceMeta = showFeedTitle || showAuthor
+  const sourceTooltip = [showFeedTitle ? entry.feed.title : "", entry.author || ""]
+    .filter(Boolean)
+    .join(" · ")
   const currentEntryIndex = filteredEntries.findIndex((item) => item.id === entry.id)
   const unreadEntriesAbove =
     currentEntryIndex > 0
@@ -193,20 +199,23 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
         >
           <div className="card-header">
             <div className="card-meta">
-              <div className="card-source">
-                {showFeedIcon && <FeedIcon className="feed-icon-mini" feed={entry.feed} />}
-                <div className="card-source-content" title={entry.feed.title}>
-                  <span className="card-source-title">{entry.feed.title}</span>
-                  {entry.author && (
-                    <>
-                      <span className="card-meta-separator">·</span>
+              {showSourceMeta && (
+                <div className="card-source">
+                  {showFeedTitle && showFeedIcon && (
+                    <FeedIcon className="feed-icon-mini" feed={entry.feed} />
+                  )}
+                  <div className="card-source-content" title={sourceTooltip || undefined}>
+                    {showFeedTitle && <span className="card-source-title">{entry.feed.title}</span>}
+                    {showFeedTitle && showAuthor && <span className="card-meta-separator">·</span>}
+                    {showAuthor && (
                       <span className="card-author" title={entry.author}>
                         {entry.author}
                       </span>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
+
               <div className="card-time-wrapper">
                 <span className="card-star">
                   <IconStarFill

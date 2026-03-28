@@ -1,4 +1,3 @@
-import { Tooltip } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import { useEffect, useState } from "react"
 
@@ -14,29 +13,26 @@ const ImageComponent = ({ imgNode, isIcon, isBigImage, index, togglePhotoSlider 
   const altText = imgNode.attribs.alt
 
   return isIcon ? (
-    <Tooltip content={altText} disabled={!altText}>
-      <img
-        {...imgNode.attribs}
-        alt={altText}
-        className="icon-image"
-        style={{
-          height: `${fontSize}rem`,
-        }}
-      />
-    </Tooltip>
+    <img
+      {...imgNode.attribs}
+      alt={altText}
+      className="icon-image"
+      title=""
+      style={{
+        height: `${fontSize}rem`,
+      }}
+    />
   ) : (
     <div style={{ position: "relative" }}>
-      <img {...imgNode.attribs} alt={altText} className={isBigImage ? "big-image" : ""} />
-      <Tooltip content={altText} disabled={!altText}>
-        <button
-          className="image-overlay-button"
-          type="button"
-          onClick={(event) => {
-            event.preventDefault()
-            togglePhotoSlider(index)
-          }}
-        />
-      </Tooltip>
+      <img {...imgNode.attribs} alt={altText} className={isBigImage ? "big-image" : ""} title="" />
+      <button
+        className="image-overlay-button"
+        type="button"
+        onClick={(event) => {
+          event.preventDefault()
+          togglePhotoSlider(index)
+        }}
+      />
     </div>
   )
 }

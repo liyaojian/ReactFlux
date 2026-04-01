@@ -336,17 +336,16 @@ const FeedMenuGroup = ({
   onMarkAllAsRead,
   onDeleteFeed,
 }) => {
-  const { showStatus, showUnreadFeedsOnly } = useStore(settingsState)
+  const { showUnreadFeedsOnly } = useStore(settingsState)
   const feedsGroupedById = useStore(feedsGroupedByIdState)
 
   const parentRef = useRef(null)
   const scrollableNodeRef = useRef(null)
-  const shouldShowUnreadFeedsOnly = showStatus === "unread" || showUnreadFeedsOnly
 
   const filteredFeeds = useMemo(() => {
     const feeds =
       feedsGroupedById[categoryId]?.filter(
-        (feed) => !shouldShowUnreadFeedsOnly || feed.unreadCount > 0,
+        (feed) => !showUnreadFeedsOnly || feed.unreadCount > 0,
       ) || []
 
     return feeds
@@ -359,7 +358,7 @@ const FeedMenuGroup = ({
         return itemA.index - itemB.index
       })
       .map(({ feed }) => feed)
-  }, [feedsGroupedById, categoryId, shouldShowUnreadFeedsOnly])
+  }, [feedsGroupedById, categoryId, showUnreadFeedsOnly])
 
   return (
     <SimpleBar
@@ -395,14 +394,12 @@ const CategoryGroup = ({
   onMarkAllAsReadFeed,
   onDeleteFeed,
 }) => {
-  const { showStatus, showUnreadFeedsOnly, sortSidebarCategoriesByUnreadCount } =
-    useStore(settingsState)
+  const { showUnreadFeedsOnly, sortSidebarCategoriesByUnreadCount } = useStore(settingsState)
   const feedsGroupedById = useStore(feedsGroupedByIdState)
   const filteredCategories = useStore(filteredCategoriesState)
 
   const location = useLocation()
   const currentPath = location.pathname
-  const shouldShowUnreadFeedsOnly = showStatus === "unread" || showUnreadFeedsOnly
 
   const visibleCategories = useMemo(() => {
     const categories = filteredCategories.filter((category) => {
@@ -411,12 +408,12 @@ const CategoryGroup = ({
       // If the category does not have a feed
       if (!feedsInCategory || feedsInCategory.length === 0) {
         // Display empty categories only if it is not "Show Unread Only" mode
-        return !shouldShowUnreadFeedsOnly
+        return !showUnreadFeedsOnly
       }
 
       // If there is a feed, filter by settings
       return feedsInCategory.some((feed) => {
-        if (shouldShowUnreadFeedsOnly) {
+        if (showUnreadFeedsOnly) {
           return feed.unreadCount > 0
         }
         return true
@@ -440,7 +437,7 @@ const CategoryGroup = ({
   }, [
     feedsGroupedById,
     filteredCategories,
-    shouldShowUnreadFeedsOnly,
+    showUnreadFeedsOnly,
     sortSidebarCategoriesByUnreadCount,
   ])
 

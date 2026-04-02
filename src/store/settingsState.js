@@ -3,7 +3,9 @@ import { persistentAtom } from "@nanostores/persistent"
 import { getBrowserLanguage } from "@/utils/locales"
 
 const SHOW_STATUS_SESSION_KEY = "settings:showStatus"
+const ORDER_DIRECTION_SESSION_KEY = "settings:orderDirection"
 const validShowStatus = new Set(["all", "starred", "unread"])
+const validOrderDirection = new Set(["asc", "desc"])
 
 const defaultValue = {
   articleWidth: 75,
@@ -64,6 +66,17 @@ const getStoredShowStatus = () => {
   return defaultValue.showStatus
 }
 
+const getStoredOrderDirection = () => {
+  const sessionStorage = getSessionStorage()
+  const storedOrderDirection = sessionStorage?.getItem(ORDER_DIRECTION_SESSION_KEY)
+
+  if (storedOrderDirection && validOrderDirection.has(storedOrderDirection)) {
+    return storedOrderDirection
+  }
+
+  return defaultValue.orderDirection
+}
+
 const syncShowStatusToSession = (showStatus) => {
   const sessionStorage = getSessionStorage()
 
@@ -79,6 +92,21 @@ const syncShowStatusToSession = (showStatus) => {
   sessionStorage.removeItem(SHOW_STATUS_SESSION_KEY)
 }
 
+const syncOrderDirectionToSession = (orderDirection) => {
+  const sessionStorage = getSessionStorage()
+
+  if (!sessionStorage) {
+    return
+  }
+
+  if (validOrderDirection.has(orderDirection)) {
+    sessionStorage.setItem(ORDER_DIRECTION_SESSION_KEY, orderDirection)
+    return
+  }
+
+  sessionStorage.removeItem(ORDER_DIRECTION_SESSION_KEY)
+}
+
 const clampNumber = (value, min, max, fallback) => {
   const numericValue = Number(value)
   if (!Number.isFinite(numericValue)) {
@@ -92,7 +120,7 @@ export const settingsState = persistentAtom("settings", defaultValue, {
     const filteredValue = {}
 
     for (const key in value) {
-      if (key in defaultValue && key !== "showStatus") {
+      if (key in defaultValue && key !== "showStatus" && key !== "orderDirection") {
         filteredValue[key] = value[key]
       }
     }
@@ -101,9 +129,22 @@ export const settingsState = persistentAtom("settings", defaultValue, {
   },
   decode: (str) => {
     const storedValue = JSON.parse(str)
-    const { showStatus: legacyShowStatus, ...restStoredValue } = storedValue
+    const {
+      orderDirection: legacyOrderDirection,
+      showStatus: legacyShowStatus,
+      ...restStoredValue
+    } = storedValue
+    const orderDirection = getStoredOrderDirection()
     const showStatus = getStoredShowStatus()
-    const mergedValue = { ...defaultValue, ...restStoredValue, showStatus }
+    const mergedValue = { ...defaultValue, ...restStoredValue, orderDirection, showStatus }
+
+    if (
+      orderDirection === defaultValue.orderDirection &&
+      validOrderDirection.has(legacyOrderDirection)
+    ) {
+      mergedValue.orderDirection = legacyOrderDirection
+      syncOrderDirectionToSession(legacyOrderDirection)
+    }
 
     if (showStatus === defaultValue.showStatus && validShowStatus.has(legacyShowStatus)) {
       mergedValue.showStatus = legacyShowStatus
@@ -123,6 +164,10 @@ export const getSettings = (key) => settingsState.get()[key]
 export const updateSettings = (settingsChanges) => {
   const nextSettings = { ...settingsState.get(), ...settingsChanges }
 
+  if ("orderDirection" in settingsChanges) {
+    syncOrderDirectionToSession(nextSettings.orderDirection)
+  }
+
   if ("showStatus" in settingsChanges) {
     syncShowStatusToSession(nextSettings.showStatus)
   }
@@ -131,6 +176,7 @@ export const updateSettings = (settingsChanges) => {
 }
 
 export const resetSettings = () => {
+  syncOrderDirectionToSession(defaultValue.orderDirection)
   syncShowStatusToSession(defaultValue.showStatus)
   settingsState.set(defaultValue)
 }

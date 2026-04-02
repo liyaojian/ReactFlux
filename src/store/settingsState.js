@@ -5,9 +5,11 @@ import { getBrowserLanguage } from "@/utils/locales"
 const SHOW_STATUS_SESSION_KEY = "settings:showStatus"
 const ORDER_DIRECTION_SESSION_KEY = "settings:orderDirection"
 const LAYOUT_FULLSCREEN_SESSION_KEY = "settings:layoutFullscreen"
+const SHOW_UNREAD_FEEDS_ONLY_SESSION_KEY = "settings:showUnreadFeedsOnly"
 const validShowStatus = new Set(["all", "starred", "unread"])
 const validOrderDirection = new Set(["asc", "desc"])
 const validLayoutFullscreen = new Set(["false", "true"])
+const validShowUnreadFeedsOnly = new Set(["false", "true"])
 
 const defaultValue = {
   articleWidth: 75,
@@ -90,6 +92,17 @@ const getStoredLayoutFullscreen = () => {
   return defaultValue.layoutFullscreen
 }
 
+const getStoredShowUnreadFeedsOnly = () => {
+  const sessionStorage = getSessionStorage()
+  const storedShowUnreadFeedsOnly = sessionStorage?.getItem(SHOW_UNREAD_FEEDS_ONLY_SESSION_KEY)
+
+  if (storedShowUnreadFeedsOnly && validShowUnreadFeedsOnly.has(storedShowUnreadFeedsOnly)) {
+    return storedShowUnreadFeedsOnly === "true"
+  }
+
+  return defaultValue.showUnreadFeedsOnly
+}
+
 const syncShowStatusToSession = (showStatus) => {
   const sessionStorage = getSessionStorage()
 
@@ -135,6 +148,21 @@ const syncLayoutFullscreenToSession = (layoutFullscreen) => {
   sessionStorage.removeItem(LAYOUT_FULLSCREEN_SESSION_KEY)
 }
 
+const syncShowUnreadFeedsOnlyToSession = (showUnreadFeedsOnly) => {
+  const sessionStorage = getSessionStorage()
+
+  if (!sessionStorage) {
+    return
+  }
+
+  if (typeof showUnreadFeedsOnly === "boolean") {
+    sessionStorage.setItem(SHOW_UNREAD_FEEDS_ONLY_SESSION_KEY, String(showUnreadFeedsOnly))
+    return
+  }
+
+  sessionStorage.removeItem(SHOW_UNREAD_FEEDS_ONLY_SESSION_KEY)
+}
+
 const clampNumber = (value, min, max, fallback) => {
   const numericValue = Number(value)
   if (!Number.isFinite(numericValue)) {
@@ -152,7 +180,8 @@ export const settingsState = persistentAtom("settings", defaultValue, {
         key in defaultValue &&
         key !== "showStatus" &&
         key !== "orderDirection" &&
-        key !== "layoutFullscreen"
+        key !== "layoutFullscreen" &&
+        key !== "showUnreadFeedsOnly"
       ) {
         filteredValue[key] = value[key]
       }
@@ -166,17 +195,20 @@ export const settingsState = persistentAtom("settings", defaultValue, {
       layoutFullscreen: legacyLayoutFullscreen,
       orderDirection: legacyOrderDirection,
       showStatus: legacyShowStatus,
+      showUnreadFeedsOnly: legacyShowUnreadFeedsOnly,
       ...restStoredValue
     } = storedValue
     const layoutFullscreen = getStoredLayoutFullscreen()
     const orderDirection = getStoredOrderDirection()
     const showStatus = getStoredShowStatus()
+    const showUnreadFeedsOnly = getStoredShowUnreadFeedsOnly()
     const mergedValue = {
       ...defaultValue,
       ...restStoredValue,
       layoutFullscreen,
       orderDirection,
       showStatus,
+      showUnreadFeedsOnly,
     }
 
     if (
@@ -198,6 +230,14 @@ export const settingsState = persistentAtom("settings", defaultValue, {
     if (showStatus === defaultValue.showStatus && validShowStatus.has(legacyShowStatus)) {
       mergedValue.showStatus = legacyShowStatus
       syncShowStatusToSession(legacyShowStatus)
+    }
+
+    if (
+      showUnreadFeedsOnly === defaultValue.showUnreadFeedsOnly &&
+      typeof legacyShowUnreadFeedsOnly === "boolean"
+    ) {
+      mergedValue.showUnreadFeedsOnly = legacyShowUnreadFeedsOnly
+      syncShowUnreadFeedsOnlyToSession(legacyShowUnreadFeedsOnly)
     }
 
     return {
@@ -225,6 +265,10 @@ export const updateSettings = (settingsChanges) => {
     syncShowStatusToSession(nextSettings.showStatus)
   }
 
+  if ("showUnreadFeedsOnly" in settingsChanges) {
+    syncShowUnreadFeedsOnlyToSession(nextSettings.showUnreadFeedsOnly)
+  }
+
   settingsState.set(nextSettings)
 }
 
@@ -232,5 +276,6 @@ export const resetSettings = () => {
   syncLayoutFullscreenToSession(defaultValue.layoutFullscreen)
   syncOrderDirectionToSession(defaultValue.orderDirection)
   syncShowStatusToSession(defaultValue.showStatus)
+  syncShowUnreadFeedsOnlyToSession(defaultValue.showUnreadFeedsOnly)
   settingsState.set(defaultValue)
 }

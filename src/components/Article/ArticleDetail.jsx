@@ -568,6 +568,10 @@ const ArticleDetail = forwardRef((_, ref) => {
     titleAlignment,
   } = useStore(settingsState)
   const scrollContainerRef = useRef(null)
+  const titleShellRef = useRef(null)
+  const titleMeasureRef = useRef(null)
+  const titleMeasureTextRef = useRef(null)
+  const titleMeasureToggleRef = useRef(null)
 
   const { isPhotoSliderVisible, setIsPhotoSliderVisible, selectedIndex, setSelectedIndex } =
     usePhotoSlider()
@@ -583,6 +587,9 @@ const ArticleDetail = forwardRef((_, ref) => {
   const [aiSummary, setAiSummary] = useState("")
   const [isSummarizing, setIsSummarizing] = useState(false)
   const [aiSummaryError, setAiSummaryError] = useState("")
+  const [isTitleExpanded, setIsTitleExpanded] = useState(false)
+  const [shouldShowTitleToggle, setShouldShowTitleToggle] = useState(false)
+  const [collapsedTitleText, setCollapsedTitleText] = useState(activeContent.title || "")
 
   const handleGenerateSummary = async () => {
     if (!settingsState.get().openaiApiKey) {
@@ -687,6 +694,103 @@ const ArticleDetail = forwardRef((_, ref) => {
   }, [activeContent.id])
 
   useEffect(() => {
+    setIsTitleExpanded(false)
+    setCollapsedTitleText(activeContent.title || "")
+  }, [activeContent.id, activeContent.title])
+
+  useEffect(() => {
+    const titleShell = titleShellRef.current
+    const titleMeasure = titleMeasureRef.current
+    const titleMeasureText = titleMeasureTextRef.current
+    const titleMeasureToggle = titleMeasureToggleRef.current
+    if (!titleShell || !titleMeasure || !titleMeasureText || !titleMeasureToggle) {
+      return
+    }
+
+    let frameId = 0
+    const fullTitle = activeContent.title || ""
+    const expandLabel = polyglot?.t("article_card.expand_title_button") || "展开标题"
+
+    const setMeasureContent = (title, includeToggle) => {
+      titleMeasureText.textContent = title
+      titleMeasureToggle.textContent = expandLabel
+      titleMeasureToggle.style.display = includeToggle ? "inline-flex" : "none"
+    }
+
+    const getMeasureHeight = () => titleMeasure.getBoundingClientRect().height
+
+    const getCollapsedMaxHeight = () => {
+      const previousTitle = titleMeasureText.textContent
+      const previousToggleText = titleMeasureToggle.textContent
+      const previousToggleDisplay = titleMeasureToggle.style.display
+
+      setMeasureContent("A", false)
+      const singleLineHeight = getMeasureHeight()
+
+      titleMeasureText.textContent = previousTitle
+      titleMeasureToggle.textContent = previousToggleText
+      titleMeasureToggle.style.display = previousToggleDisplay
+
+      return singleLineHeight * 3 + 1
+    }
+
+    const updateTitleToggleVisibility = () => {
+      globalThis.cancelAnimationFrame(frameId)
+      frameId = globalThis.requestAnimationFrame(() => {
+        const maxHeight = getCollapsedMaxHeight()
+        setMeasureContent(fullTitle, false)
+
+        if (getMeasureHeight() <= maxHeight) {
+          setCollapsedTitleText(fullTitle)
+          setShouldShowTitleToggle(false)
+          setIsTitleExpanded(false)
+          return
+        }
+
+        let low = 0
+        let high = fullTitle.length
+        let best = `${fullTitle.slice(0, 1)}...`
+
+        while (low <= high) {
+          const middle = Math.floor((low + high) / 2)
+          const candidateBase = fullTitle.slice(0, middle).trimEnd()
+          const candidate = `${candidateBase || fullTitle.slice(0, 1)}...`
+
+          setMeasureContent(candidate, true)
+
+          if (getMeasureHeight() <= maxHeight) {
+            best = candidate
+            low = middle + 1
+          } else {
+            high = middle - 1
+          }
+        }
+
+        setCollapsedTitleText(best)
+        setShouldShowTitleToggle(true)
+      })
+    }
+
+    updateTitleToggleVisibility()
+
+    if (!globalThis.ResizeObserver) {
+      globalThis.addEventListener("resize", updateTitleToggleVisibility)
+      return () => {
+        globalThis.cancelAnimationFrame(frameId)
+        globalThis.removeEventListener("resize", updateTitleToggleVisibility)
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(updateTitleToggleVisibility)
+    resizeObserver.observe(titleShell)
+
+    return () => {
+      globalThis.cancelAnimationFrame(frameId)
+      resizeObserver.disconnect()
+    }
+  }, [activeContent.id, activeContent.title, articleWidth, fontFamily, polyglot, titleAlignment])
+
+  useEffect(() => {
     setCandidateTrack(mediaCandidateInfo.candidate)
   }, [mediaCandidateInfo.candidate])
 
@@ -695,6 +799,13 @@ const ArticleDetail = forwardRef((_, ref) => {
       setCandidateTrack(null)
     }
   }, [])
+
+  const toggleTitleLabel =
+    polyglot?.t(
+      isTitleExpanded ? "article_card.collapse_title_button" : "article_card.expand_title_button",
+    ) || (isTitleExpanded ? "收起标题" : "展开标题")
+  const displayTitleText =
+    isTitleExpanded || !shouldShowTitleToggle ? activeContent.title : collapsedTitleText
 
   return (
     <article
@@ -717,9 +828,52 @@ const ArticleDetail = forwardRef((_, ref) => {
               heading={3}
               style={{ fontFamily: fontFamily }}
             >
-              <a href={activeContent.url} rel="noopener noreferrer" target="_blank">
-                {activeContent.title}
-              </a>
+              <span ref={titleShellRef} className="article-title-shell">
+                <span className="article-title-inline">
+                  {activeContent.url ? (
+                    <a
+                      className="article-title-text"
+                      href={activeContent.url}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      title={activeContent.title}
+                    >
+                      {displayTitleText}
+                    </a>
+                  ) : (
+                    <span className="article-title-text" title={activeContent.title}>
+                      {displayTitleText}
+                    </span>
+                  )}
+                  {shouldShowTitleToggle && (
+                    <button
+                      aria-expanded={isTitleExpanded}
+                      className="article-title-toggle article-title-toggle-inline"
+                      title={toggleTitleLabel}
+                      type="button"
+                      onClick={() => setIsTitleExpanded((prev) => !prev)}
+                    >
+                      {toggleTitleLabel}
+                    </button>
+                  )}
+                </span>
+                <span aria-hidden="true" className="article-title-measure-wrapper">
+                  <span ref={titleMeasureRef} className="article-title-measure">
+                    <span
+                      ref={titleMeasureTextRef}
+                      className="article-title-text article-title-measure-text"
+                    >
+                      {activeContent.title}
+                    </span>
+                    <span
+                      ref={titleMeasureToggleRef}
+                      className="article-title-toggle article-title-toggle-inline article-title-measure-toggle"
+                    >
+                      {polyglot?.t("article_card.expand_title_button") || "展开标题"}
+                    </span>
+                  </span>
+                </span>
+              </span>
             </Typography.Title>
             <div className="article-meta">
               <Typography.Text>
@@ -758,10 +912,10 @@ const ArticleDetail = forwardRef((_, ref) => {
               {aiSummary && (
                 <Alert
                   closable
+                  content={<div style={{ fontSize: "1.1rem", lineHeight: 1.6 }}>{aiSummary}</div>}
                   style={{ marginTop: "10px", textAlign: "left" }}
                   title={<span style={{ fontSize: "1.2rem", fontWeight: 600 }}>✨ AI Summary</span>}
                   type="info"
-                  content={<div style={{ fontSize: "1.1rem", lineHeight: 1.6 }}>{aiSummary}</div>}
                   onClose={() => setAiSummary("")}
                 />
               )}

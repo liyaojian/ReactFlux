@@ -102,6 +102,8 @@
     "save_to_third_party_services_tooltip": "Bei Drittanbieter speichern",
     "share_tooltip": "Teilen",
     "view_comments_tooltip": "Kommentare anzeigen",
+    "expand_title_button": "Expand title",
+    "collapse_title_button": "Collapse title",
     "generate_ai_summary": "✨ Generate AI Summary",
     "ai_summary_loading": "Generating summary...",
     "ai_summary_configure_missing": "Please configure OpenAI parameters in settings first",

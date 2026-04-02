@@ -104,6 +104,8 @@
     "save_to_third_party_services_tooltip": "保存到第三方服务",
     "share_tooltip": "分享",
     "view_comments_tooltip": "查看评论",
+    "expand_title_button": "展开",
+    "collapse_title_button": "收起",
     "generate_ai_summary": "✨ 生成 AI 总结",
     "ai_summary_loading": "正在生成总结...",
     "ai_summary_configure_missing": "请先在设置中配置 OpenAI 参数",

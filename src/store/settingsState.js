@@ -4,8 +4,10 @@ import { getBrowserLanguage } from "@/utils/locales"
 
 const SHOW_STATUS_SESSION_KEY = "settings:showStatus"
 const ORDER_DIRECTION_SESSION_KEY = "settings:orderDirection"
+const LAYOUT_FULLSCREEN_SESSION_KEY = "settings:layoutFullscreen"
 const validShowStatus = new Set(["all", "starred", "unread"])
 const validOrderDirection = new Set(["asc", "desc"])
+const validLayoutFullscreen = new Set(["false", "true"])
 
 const defaultValue = {
   articleWidth: 75,
@@ -77,6 +79,17 @@ const getStoredOrderDirection = () => {
   return defaultValue.orderDirection
 }
 
+const getStoredLayoutFullscreen = () => {
+  const sessionStorage = getSessionStorage()
+  const storedLayoutFullscreen = sessionStorage?.getItem(LAYOUT_FULLSCREEN_SESSION_KEY)
+
+  if (storedLayoutFullscreen && validLayoutFullscreen.has(storedLayoutFullscreen)) {
+    return storedLayoutFullscreen === "true"
+  }
+
+  return defaultValue.layoutFullscreen
+}
+
 const syncShowStatusToSession = (showStatus) => {
   const sessionStorage = getSessionStorage()
 
@@ -107,6 +120,21 @@ const syncOrderDirectionToSession = (orderDirection) => {
   sessionStorage.removeItem(ORDER_DIRECTION_SESSION_KEY)
 }
 
+const syncLayoutFullscreenToSession = (layoutFullscreen) => {
+  const sessionStorage = getSessionStorage()
+
+  if (!sessionStorage) {
+    return
+  }
+
+  if (typeof layoutFullscreen === "boolean") {
+    sessionStorage.setItem(LAYOUT_FULLSCREEN_SESSION_KEY, String(layoutFullscreen))
+    return
+  }
+
+  sessionStorage.removeItem(LAYOUT_FULLSCREEN_SESSION_KEY)
+}
+
 const clampNumber = (value, min, max, fallback) => {
   const numericValue = Number(value)
   if (!Number.isFinite(numericValue)) {
@@ -120,7 +148,12 @@ export const settingsState = persistentAtom("settings", defaultValue, {
     const filteredValue = {}
 
     for (const key in value) {
-      if (key in defaultValue && key !== "showStatus" && key !== "orderDirection") {
+      if (
+        key in defaultValue &&
+        key !== "showStatus" &&
+        key !== "orderDirection" &&
+        key !== "layoutFullscreen"
+      ) {
         filteredValue[key] = value[key]
       }
     }
@@ -130,13 +163,29 @@ export const settingsState = persistentAtom("settings", defaultValue, {
   decode: (str) => {
     const storedValue = JSON.parse(str)
     const {
+      layoutFullscreen: legacyLayoutFullscreen,
       orderDirection: legacyOrderDirection,
       showStatus: legacyShowStatus,
       ...restStoredValue
     } = storedValue
+    const layoutFullscreen = getStoredLayoutFullscreen()
     const orderDirection = getStoredOrderDirection()
     const showStatus = getStoredShowStatus()
-    const mergedValue = { ...defaultValue, ...restStoredValue, orderDirection, showStatus }
+    const mergedValue = {
+      ...defaultValue,
+      ...restStoredValue,
+      layoutFullscreen,
+      orderDirection,
+      showStatus,
+    }
+
+    if (
+      layoutFullscreen === defaultValue.layoutFullscreen &&
+      typeof legacyLayoutFullscreen === "boolean"
+    ) {
+      mergedValue.layoutFullscreen = legacyLayoutFullscreen
+      syncLayoutFullscreenToSession(legacyLayoutFullscreen)
+    }
 
     if (
       orderDirection === defaultValue.orderDirection &&
@@ -164,6 +213,10 @@ export const getSettings = (key) => settingsState.get()[key]
 export const updateSettings = (settingsChanges) => {
   const nextSettings = { ...settingsState.get(), ...settingsChanges }
 
+  if ("layoutFullscreen" in settingsChanges) {
+    syncLayoutFullscreenToSession(nextSettings.layoutFullscreen)
+  }
+
   if ("orderDirection" in settingsChanges) {
     syncOrderDirectionToSession(nextSettings.orderDirection)
   }
@@ -176,6 +229,7 @@ export const updateSettings = (settingsChanges) => {
 }
 
 export const resetSettings = () => {
+  syncLayoutFullscreenToSession(defaultValue.layoutFullscreen)
   syncOrderDirectionToSession(defaultValue.orderDirection)
   syncShowStatusToSession(defaultValue.showStatus)
   settingsState.set(defaultValue)

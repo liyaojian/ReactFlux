@@ -18,7 +18,7 @@ import { Navigate, useLocation, useNavigate, useSearchParams } from "react-route
 import useLanguage, { polyglotState } from "@/hooks/useLanguage"
 import useTheme from "@/hooks/useTheme"
 import { authState, setAuth } from "@/store/authState"
-import { settingsState } from "@/store/settingsState"
+import { getLandingPath } from "@/store/sidebarState"
 import isValidAuth from "@/utils/auth"
 import { handleEnterKeyToSubmit, validateAndFormatFormFields } from "@/utils/form"
 import hideSpinner from "@/utils/loading"
@@ -29,7 +29,6 @@ const Login = () => {
   useTheme()
 
   const auth = useStore(authState)
-  const { homePage } = useStore(settingsState)
   const { polyglot } = useStore(polyglotState)
 
   const [loginForm] = useForm()
@@ -59,7 +58,7 @@ const Login = () => {
           title: polyglot.t("login.success"),
         })
         setAuth({ server, token, username, password })
-        navigate(redirectTo || `/${homePage}`, { replace: true })
+        navigate(redirectTo || getLandingPath(), { replace: true })
       }
     } catch (error) {
       console.error(error)
@@ -93,7 +92,7 @@ const Login = () => {
   }, [loginForm, polyglot])
 
   if (isValidAuth(auth)) {
-    return <Navigate to={redirectTo || `/${homePage}`} />
+    return <Navigate to={redirectTo || getLandingPath()} />
   }
 
   return (

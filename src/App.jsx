@@ -6,6 +6,7 @@ import frFR from "@arco-design/web-react/es/locale/fr-FR"
 import zhCN from "@arco-design/web-react/es/locale/zh-CN"
 import { useStore } from "@nanostores/react"
 import { useEffect } from "react"
+import { useLocation } from "react-router"
 
 import "./App.css"
 import Main from "./components/Main/Main"
@@ -16,6 +17,7 @@ import useScreenWidth from "./hooks/useScreenWidth"
 import useTheme from "./hooks/useTheme"
 import { contentState } from "./store/contentState"
 import { settingsState, updateSettings } from "./store/settingsState"
+import { setLastVisitedPath } from "./store/sidebarState"
 import hideSpinner from "./utils/loading"
 
 const localMap = {
@@ -38,6 +40,11 @@ const App = () => {
   const { polyglot } = useStore(polyglotState)
   const { language, layoutFullscreen } = useStore(settingsState)
   const locale = getLocale(language)
+  const location = useLocation()
+
+  useEffect(() => {
+    setLastVisitedPath(location.pathname)
+  }, [location.pathname])
 
   useEffect(() => {
     hideSpinner()

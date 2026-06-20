@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter, redirect } from "react-router"
 
 import App from "./App"
 import All from "./pages/All"
@@ -6,11 +6,11 @@ import Category from "./pages/Category"
 import ErrorPage from "./pages/ErrorPage"
 import Feed from "./pages/Feed"
 import History from "./pages/History"
-import HomeRedirect from "./pages/HomeRedirect"
 import Login from "./pages/Login"
 import RouterProtect from "./pages/RouterProtect"
 import Starred from "./pages/Starred"
 import Today from "./pages/Today"
+import { getLandingPath } from "./store/sidebarState"
 
 const pageRoutes = {
   all: <All />,
@@ -36,7 +36,7 @@ const router = createBrowserRouter(
       children: [
         {
           element: <RouterProtect />,
-          children: [...routes, { index: true, element: <HomeRedirect /> }],
+          children: [...routes, { index: true, loader: () => redirect(getLandingPath()) }],
         },
       ],
     },

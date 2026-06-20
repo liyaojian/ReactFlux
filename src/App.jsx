@@ -47,8 +47,10 @@ const App = () => {
   }, [location.pathname])
 
   useEffect(() => {
-    hideSpinner()
-  }, [])
+    if (polyglot) {
+      hideSpinner()
+    }
+  }, [polyglot])
 
   useEffect(() => {
     document.body.classList.toggle("article-fullscreen", layoutFullscreen)

@@ -30,6 +30,23 @@
     Learn how to configure a non-root public URL by running `npm run build`.
   -->
     <link rel="stylesheet" href="/styles/loading.css" />
+    <style>
+      html,
+      body,
+      #root {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background-color: rgb(250 250 249);
+      }
+
+      html[data-theme="dark"],
+      html[data-theme="dark"] body,
+      html[data-theme="dark"] #root {
+        background-color: rgb(12 10 9);
+      }
+    </style>
+    <script src="/startup.js"></script>
     <link rel="stylesheet" href="/styles/fonts.css" />
     <link
       rel="stylesheet"

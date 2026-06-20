@@ -79,8 +79,10 @@ const Login = () => {
   }
 
   useEffect(() => {
-    hideSpinner()
-  }, [])
+    if (polyglot) {
+      hideSpinner()
+    }
+  }, [polyglot])
 
   useEffect(() => {
     const url = new URL(globalThis.location.href)

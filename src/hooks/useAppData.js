@@ -1,3 +1,4 @@
+import { Message } from "@arco-design/web-react"
 import { useCallback, useRef } from "react"
 
 import {
@@ -133,22 +134,22 @@ const useAppData = () => {
 
       setIsCoreDataReady(true)
 
-      const [counters, versionData, todayData] = await Promise.all([
-        fetchCounters(),
-        getVersion(),
-        fetchUnreadToday(),
-      ])
+      try {
+        const [counters, versionData] = await Promise.all([fetchCounters(), getVersion()])
+        const { version } = versionData
+        setVersion(version)
+        await fetchIntegrationStatus(version)
+        updateUnreadInfo(feeds, counters)
+      } catch (error) {
+        console.error("Error fetching secondary app data:", error)
+      }
 
-      const { version } = versionData
-      setVersion(version)
-      await fetchIntegrationStatus(version)
-
-      updateUnreadInfo(feeds, counters)
-
+      await fetchUnreadToday()
       setIsAppDataReady(true)
-      return { counters, feeds, categories, version, todayData }
+      return { feeds, categories }
     } catch (error) {
       console.error("Error fetching app data:", error)
+      Message.error(error.message || "Failed to load app data")
     } finally {
       isLoading.current = false
     }

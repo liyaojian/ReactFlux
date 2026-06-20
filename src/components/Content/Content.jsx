@@ -39,7 +39,6 @@ import "./Content.css"
 const Content = ({ info, getEntries, markAllAsRead }) => {
   const { activeContent, entries, filterDate, filterString, isArticleLoading } =
     useStore(contentState)
-  const { isAppDataReady } = useStore(dataState)
   const {
     enableSwipeGesture,
     enableSwipeLeftToOpenLink,
@@ -74,13 +73,23 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
   const { isBelowMedium } = useScreenWidth()
 
   const fetchArticleListOnly = async () => {
-    await (isAppDataReady ? fetchArticleList(getEntries) : fetchAppData())
+    if (!dataState.get().isAppDataReady) {
+      await fetchAppData()
+    }
+
+    if (dataState.get().isAppDataReady) {
+      await fetchArticleList(getEntries)
+    }
   }
 
   const fetchArticleListWithRelatedData = async () => {
-    await (isAppDataReady
-      ? Promise.all([fetchArticleList(getEntries), fetchFeedRelatedData()])
-      : fetchAppData())
+    if (!dataState.get().isAppDataReady) {
+      await fetchAppData()
+    }
+
+    if (dataState.get().isAppDataReady) {
+      await Promise.all([fetchArticleList(getEntries), fetchFeedRelatedData()])
+    }
   }
 
   const fetchSingleEntry = async (entryId) => {

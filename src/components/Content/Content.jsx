@@ -2,7 +2,7 @@ import { Button, Notification, Typography } from "@arco-design/web-react"
 import { IconEmpty, IconLaunch, IconLeft, IconRight } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
 import { AnimatePresence } from "framer-motion"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router"
 import { useSwipeable } from "react-swipeable"
 
@@ -53,6 +53,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
 
   const [isSwipingLeft, setIsSwipingLeft] = useState(false)
   const [isSwipingRight, setIsSwipingRight] = useState(false)
+  const cardsRef = useRef(null)
 
   const location = useLocation()
   const params = useParams()
@@ -241,6 +242,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
         <SearchAndSortBar />
         <ArticleList
           ref={entryListRef}
+          cardsRef={cardsRef}
           getEntries={getEntries}
           handleEntryClick={handleEntryClick}
         />

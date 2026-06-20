@@ -35,6 +35,7 @@ import { fetchAISummary, stripHtmlAndGetText } from "@/utils/ai"
 import { generateReadableDate, generateReadingTime } from "@/utils/date"
 import { extractImageSources } from "@/utils/images"
 import { extractPlayableMediaCandidate } from "@/utils/media"
+import { IS_IOS_SAFARI } from "@/utils/platform"
 import "./ArticleDetail.css"
 import "./littlefoot.css"
 
@@ -687,10 +688,14 @@ const ArticleDetail = forwardRef((_, ref) => {
 
   // Focus the scrollable area when activeContent changes
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      const scrollElement = scrollContainerRef.current.getScrollElement()
-      scrollElement?.focus()
+    if (!scrollContainerRef.current) {
+      return
     }
+
+    const scrollElement = IS_IOS_SAFARI
+      ? scrollContainerRef.current
+      : scrollContainerRef.current.getScrollElement?.()
+    scrollElement?.focus()
   }, [activeContent.id])
 
   useEffect(() => {
@@ -807,17 +812,26 @@ const ArticleDetail = forwardRef((_, ref) => {
   const displayTitleText =
     isTitleExpanded || !shouldShowTitleToggle ? activeContent.title : collapsedTitleText
 
+  const ScrollContainer = IS_IOS_SAFARI ? "div" : SimpleBar
+  const scrollContainerProps = IS_IOS_SAFARI
+    ? {
+        className: "scroll-container scroll-container-native",
+        ref: scrollContainerRef,
+        tabIndex: -1,
+      }
+    : {
+        className: "scroll-container",
+        ref: scrollContainerRef,
+        scrollableNodeProps: { tabIndex: -1 },
+      }
+
   return (
     <article
       ref={ref}
       className={`article-content ${edgeToEdgeImages ? "edge-to-edge" : ""}`}
       tabIndex={-1}
     >
-      <SimpleBar
-        ref={scrollContainerRef}
-        className="scroll-container"
-        scrollableNodeProps={{ tabIndex: -1 }}
-      >
+      <ScrollContainer {...scrollContainerProps}>
         <FadeTransition y={20}>
           <div
             className="article-header"
@@ -988,7 +1002,7 @@ const ArticleDetail = forwardRef((_, ref) => {
             />
           </div>
         </FadeTransition>
-      </SimpleBar>
+      </ScrollContainer>
     </article>
   )
 })

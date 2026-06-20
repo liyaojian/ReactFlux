@@ -9,6 +9,7 @@ import { polyglotState } from "@/hooks/useLanguage"
 import { setActiveContent, setIsArticleLoading } from "@/store/contentState"
 import { settingsState } from "@/store/settingsState"
 import { ANIMATION_DURATION_MS } from "@/utils/constants"
+import { getArticleScrollElement } from "@/utils/platform"
 import { buildEntryDetailPath, extractBasePath, isEntryDetailPath } from "@/utils/url"
 
 const Context = createContext()
@@ -53,7 +54,7 @@ export const ContextProvider = ({ children }) => {
       setTimeout(() => {
         const articleContent = entryDetailRef.current
         if (articleContent) {
-          const contentWrapper = articleContent.querySelector(".simplebar-content-wrapper")
+          const contentWrapper = getArticleScrollElement(articleContent)
           if (contentWrapper) {
             contentWrapper.scroll({ top: 0 })
           }

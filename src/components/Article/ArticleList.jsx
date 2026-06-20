@@ -1,7 +1,7 @@
 import { Divider, Spin } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
-import { forwardRef, useCallback, useEffect, useMemo } from "react"
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react"
 import { useInView } from "react-intersection-observer"
 import SimpleBar from "simplebar-react"
 import { Virtualizer } from "virtua"
@@ -13,6 +13,7 @@ import FadeTransition from "@/components/ui/FadeTransition"
 import Ripple from "@/components/ui/Ripple"
 import useLoadMore from "@/hooks/useLoadMore"
 import { contentState, filteredEntriesState } from "@/store/contentState"
+import { IS_IOS_SAFARI } from "@/utils/platform"
 
 import "./ArticleList.css"
 
@@ -49,9 +50,22 @@ const LoadMoreComponent = ({ getEntries }) => {
 const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref) => {
   const { isArticleListReady, loadMoreVisible } = useStore(contentState)
   const filteredEntries = useStore(filteredEntriesState)
+  const wrapperRef = useRef(null)
 
   const { loadingMore, handleLoadMore } = useLoadMore()
   const canLoadMore = loadMoreVisible && isArticleListReady && !loadingMore
+
+  useImperativeHandle(
+    ref,
+    () =>
+      IS_IOS_SAFARI
+        ? {
+            contentWrapperEl: cardsRef.current,
+            el: wrapperRef.current,
+          }
+        : null,
+    [cardsRef],
+  )
 
   const checkAndLoadMore = useMemo(
     () =>
@@ -69,40 +83,70 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
     [canLoadMore, handleLoadMore, getEntries],
   )
 
-  return (
-    <SimpleBar ref={ref} className="entry-list" scrollableNodeProps={{ ref: cardsRef }}>
+  const handleScroll = useCallback(
+    (event) => {
+      checkAndLoadMore(event.currentTarget)
+    },
+    [checkAndLoadMore],
+  )
+
+  const renderEntries = () =>
+    filteredEntries.map((entry, index) => (
+      <div key={entry.id}>
+        <ArticleCard entry={entry} handleEntryClick={handleEntryClick} scrollRootRef={cardsRef}>
+          <Ripple color="var(--color-text-4)" duration={1000} />
+        </ArticleCard>
+        {index < filteredEntries.length - 1 && (
+          <Divider
+            style={{
+              margin: "6px 0",
+              borderBottom: "1px solid var(--color-border-2)",
+            }}
+          />
+        )}
+      </div>
+    ))
+
+  const listBody = (
+    <>
       <LoadingCards />
       {isArticleListReady && (
         <FadeTransition y={20}>
-          <Virtualizer
-            overscan={10}
-            scrollRef={cardsRef}
-            onScroll={() => {
-              const element = cardsRef.current
-              if (element) {
-                checkAndLoadMore(element)
-              }
-            }}
-          >
-            {filteredEntries.map((entry, index) => (
-              <div key={entry.id}>
-                <ArticleCard entry={entry} handleEntryClick={handleEntryClick}>
-                  <Ripple color="var(--color-text-4)" duration={1000} />
-                </ArticleCard>
-                {index < filteredEntries.length - 1 && (
-                  <Divider
-                    style={{
-                      margin: "6px 0",
-                      borderBottom: "1px solid var(--color-border-2)",
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </Virtualizer>
+          {IS_IOS_SAFARI ? (
+            renderEntries()
+          ) : (
+            <Virtualizer
+              overscan={10}
+              scrollRef={cardsRef}
+              onScroll={() => {
+                const element = cardsRef.current
+                if (element) {
+                  checkAndLoadMore(element)
+                }
+              }}
+            >
+              {renderEntries()}
+            </Virtualizer>
+          )}
         </FadeTransition>
       )}
       <LoadMoreComponent getEntries={getEntries} />
+    </>
+  )
+
+  if (IS_IOS_SAFARI) {
+    return (
+      <div ref={wrapperRef} className="entry-list-wrapper">
+        <div ref={cardsRef} className="entry-list entry-list-native" onScroll={handleScroll}>
+          {listBody}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <SimpleBar ref={ref} className="entry-list" scrollableNodeProps={{ ref: cardsRef }}>
+      {listBody}
     </SimpleBar>
   )
 })

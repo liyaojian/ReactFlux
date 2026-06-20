@@ -17,6 +17,7 @@ import { updateSettings } from "@/store/settingsState"
 import { ANIMATION_DURATION_MS } from "@/utils/constants"
 import { openInNewTab } from "@/utils/dom"
 import { extractImageSources } from "@/utils/images"
+import { getEntryListRoot, getEntryListScrollElement } from "@/utils/platform"
 
 const findAdjacentUnreadEntry = (currentIndex, direction, entries) => {
   const isSearchingBackward = direction === "prev"
@@ -38,14 +39,17 @@ const useKeyHandlers = () => {
   const { entryListRef, handleEntryClick, closeActiveContent } = useContentContext()
 
   const scrollSelectedCardIntoView = () => {
-    if (entryListRef.current) {
-      const selectedCard = entryListRef.current.el.querySelector(".card-wrapper.selected")
-      if (selectedCard) {
-        selectedCard.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        })
-      }
+    const listRoot = getEntryListRoot(entryListRef)
+    if (!listRoot) {
+      return
+    }
+
+    const selectedCard = listRoot.querySelector(".card-wrapper.selected")
+    if (selectedCard) {
+      selectedCard.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      })
     }
   }
 
@@ -75,7 +79,7 @@ const useKeyHandlers = () => {
       closeActiveContent()
       updateSettings({ layoutFullscreen: false })
       if (entryListRef.current) {
-        entryListRef.current.contentWrapperEl.focus()
+        getEntryListScrollElement(entryListRef)?.focus()
       }
     }),
   )

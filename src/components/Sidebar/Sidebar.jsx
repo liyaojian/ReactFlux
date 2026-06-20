@@ -58,6 +58,7 @@ import {
 } from "@/store/dataState"
 import { settingsState, updateSettings } from "@/store/settingsState"
 import { expandedCategoriesState, setExpandedCategories } from "@/store/sidebarState"
+import { IS_IOS_SAFARI } from "@/utils/platform"
 
 import "./Sidebar.css"
 
@@ -360,6 +361,25 @@ const FeedMenuGroup = ({
       .map(({ feed }) => feed)
   }, [feedsGroupedById, categoryId, showUnreadFeedsOnly])
 
+  const feedItems = filteredFeeds.map((feed) => (
+    <FeedMenuItem
+      key={feed.id}
+      feed={feed}
+      onDeleteFeed={onDeleteFeed}
+      onEditFeed={onEditFeed}
+      onMarkAllAsRead={onMarkAllAsRead}
+      onRefreshFeed={onRefreshFeed}
+    />
+  ))
+
+  if (IS_IOS_SAFARI) {
+    return (
+      <div ref={scrollableNodeRef} className="feed-menu-group-native">
+        {feedItems}
+      </div>
+    )
+  }
+
   return (
     <SimpleBar
       ref={parentRef}
@@ -369,16 +389,7 @@ const FeedMenuGroup = ({
       }}
     >
       <Virtualizer overscan={10} scrollRef={scrollableNodeRef}>
-        {filteredFeeds.map((feed) => (
-          <FeedMenuItem
-            key={feed.id}
-            feed={feed}
-            onDeleteFeed={onDeleteFeed}
-            onEditFeed={onEditFeed}
-            onMarkAllAsRead={onMarkAllAsRead}
-            onRefreshFeed={onRefreshFeed}
-          />
-        ))}
+        {feedItems}
       </Virtualizer>
     </SimpleBar>
   )
@@ -708,60 +719,125 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar-container">
-      <SimpleBar style={{ maxHeight: "100%" }}>
-        <Menu hasCollapseButton={false} selectedKeys={selectedKeys}>
-          <div className="menu-header">
-            <span style={{ display: "flex", alignItems: "center" }}>
-              <Avatar className="avatar" size={32}>
-                <IconBook style={{ color: "var(--color-bg-1)" }} />
-              </Avatar>
-              <Typography.Title heading={6} style={{ margin: 0 }}>
-                ReactFlux
-              </Typography.Title>
-            </span>
-            <Profile />
-          </div>
-          <Typography.Title className="section-title" heading={6} style={{ paddingLeft: "12px" }}>
-            {polyglot.t("sidebar.articles")}
-          </Typography.Title>
-          <SidebarMenuItems />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography.Title className="section-title" heading={6} style={{ paddingLeft: "12px" }}>
-              {polyglot.t("sidebar.feeds")}
-            </Typography.Title>
-            <div style={{ display: "flex", gap: "8px", marginRight: "8px" }}>
-              <AddFeed />
-              <MoreOptionsDropdown />
+      {IS_IOS_SAFARI ? (
+        <div className="sidebar-scroll-native" style={{ maxHeight: "100%" }}>
+          <Menu hasCollapseButton={false} selectedKeys={selectedKeys}>
+            <div className="menu-header">
+              <span style={{ display: "flex", alignItems: "center" }}>
+                <Avatar className="avatar" size={32}>
+                  <IconBook style={{ color: "var(--color-bg-1)" }} />
+                </Avatar>
+                <Typography.Title heading={6} style={{ margin: 0 }}>
+                  ReactFlux
+                </Typography.Title>
+              </span>
+              <Profile />
             </div>
-          </div>
-          <Skeleton animation={true} loading={!isCoreDataReady} text={{ rows: 6 }} />
-          {isCoreDataReady && (
-            <Collapse
-              activeKey={expandedCategories}
-              bordered={false}
-              triggerRegion="icon"
-              onChange={(_key, keys) => setExpandedCategories(keys)}
+            <Typography.Title className="section-title" heading={6} style={{ paddingLeft: "12px" }}>
+              {polyglot.t("sidebar.articles")}
+            </Typography.Title>
+            <SidebarMenuItems />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
-              <CategoryGroup
-                onDeleteCategory={handleDeleteCategory}
-                onDeleteFeed={handleDeleteFeed}
-                onEditCategory={handleEditCategory}
-                onEditFeed={handleEditFeed}
-                onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
-                onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
-                onRefreshCategory={handleRefreshCategory}
-                onRefreshFeed={handleRefreshFeed}
-              />
-            </Collapse>
-          )}
-        </Menu>
-      </SimpleBar>
+              <Typography.Title
+                className="section-title"
+                heading={6}
+                style={{ paddingLeft: "12px" }}
+              >
+                {polyglot.t("sidebar.feeds")}
+              </Typography.Title>
+              <div style={{ display: "flex", gap: "8px", marginRight: "8px" }}>
+                <AddFeed />
+                <MoreOptionsDropdown />
+              </div>
+            </div>
+            <Skeleton animation={true} loading={!isCoreDataReady} text={{ rows: 6 }} />
+            {isCoreDataReady && (
+              <Collapse
+                activeKey={expandedCategories}
+                bordered={false}
+                triggerRegion="icon"
+                onChange={(_key, keys) => setExpandedCategories(keys)}
+              >
+                <CategoryGroup
+                  onDeleteCategory={handleDeleteCategory}
+                  onDeleteFeed={handleDeleteFeed}
+                  onEditCategory={handleEditCategory}
+                  onEditFeed={handleEditFeed}
+                  onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
+                  onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
+                  onRefreshCategory={handleRefreshCategory}
+                  onRefreshFeed={handleRefreshFeed}
+                />
+              </Collapse>
+            )}
+          </Menu>
+        </div>
+      ) : (
+        <SimpleBar style={{ maxHeight: "100%" }}>
+          <Menu hasCollapseButton={false} selectedKeys={selectedKeys}>
+            <div className="menu-header">
+              <span style={{ display: "flex", alignItems: "center" }}>
+                <Avatar className="avatar" size={32}>
+                  <IconBook style={{ color: "var(--color-bg-1)" }} />
+                </Avatar>
+                <Typography.Title heading={6} style={{ margin: 0 }}>
+                  ReactFlux
+                </Typography.Title>
+              </span>
+              <Profile />
+            </div>
+            <Typography.Title className="section-title" heading={6} style={{ paddingLeft: "12px" }}>
+              {polyglot.t("sidebar.articles")}
+            </Typography.Title>
+            <SidebarMenuItems />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography.Title
+                className="section-title"
+                heading={6}
+                style={{ paddingLeft: "12px" }}
+              >
+                {polyglot.t("sidebar.feeds")}
+              </Typography.Title>
+              <div style={{ display: "flex", gap: "8px", marginRight: "8px" }}>
+                <AddFeed />
+                <MoreOptionsDropdown />
+              </div>
+            </div>
+            <Skeleton animation={true} loading={!isCoreDataReady} text={{ rows: 6 }} />
+            {isCoreDataReady && (
+              <Collapse
+                activeKey={expandedCategories}
+                bordered={false}
+                triggerRegion="icon"
+                onChange={(_key, keys) => setExpandedCategories(keys)}
+              >
+                <CategoryGroup
+                  onDeleteCategory={handleDeleteCategory}
+                  onDeleteFeed={handleDeleteFeed}
+                  onEditCategory={handleEditCategory}
+                  onEditFeed={handleEditFeed}
+                  onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
+                  onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
+                  onRefreshCategory={handleRefreshCategory}
+                  onRefreshFeed={handleRefreshFeed}
+                />
+              </Collapse>
+            )}
+          </Menu>
+        </SimpleBar>
+      )}
 
       {selectedCategory && (
         <EditCategoryModal

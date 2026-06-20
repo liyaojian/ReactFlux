@@ -1,0 +1,64 @@
+html.ios-safari,
+html.ios-safari body,
+html.ios-safari #root {
+  height: 100%;
+  height: 100dvh;
+}
+
+html.ios-safari .main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+html.ios-safari .entry-col {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.ios-safari .entry-list-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+html.ios-safari .entry-list,
+html.ios-safari .entry-list-native {
+  contain: none;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+html.ios-safari .scroll-container,
+html.ios-safari .scroll-container-native {
+  contain: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+html.ios-safari .sidebar-scroll-native,
+html.ios-safari .feed-menu-group-native {
+  flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+html.ios-safari .article-container {
+  touch-action: pan-y;
+}
+
+@media screen and (max-width: 768px) {
+  html.ios-safari .article-container {
+    height: 100dvh !important;
+  }
+
+  html.ios-safari .entry-col {
+    height: 100%;
+  }
+}

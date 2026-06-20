@@ -22,7 +22,7 @@ import { settingsState } from "@/store/settingsState"
 import { generateReadingTime, generateRelativeTime } from "@/utils/date"
 import "./ArticleCard.css"
 
-const ArticleCard = ({ entry, handleEntryClick, children }) => {
+const ArticleCard = ({ entry, handleEntryClick, children, scrollRootRef }) => {
   const {
     enableContextMenu,
     markReadOnScroll,
@@ -70,6 +70,15 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
       return
     }
 
+    const scrollRoot =
+      scrollRootRef?.current ??
+      document.querySelector(".entry-list .simplebar-content-wrapper") ??
+      document.querySelector(".entry-list-native")
+
+    if (!scrollRoot) {
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const observerEntry of entries) {
@@ -86,9 +95,7 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
         }
       },
       {
-        // Set the root element as the scroll container
-        root: document.querySelector(".entry-list"),
-        // Set threshold to 0.2
+        root: scrollRoot,
         threshold: 0.2,
       },
     )
@@ -103,7 +110,7 @@ const ArticleCard = ({ entry, handleEntryClick, children }) => {
         observer.unobserve(element)
       }
     }
-  }, [entry, markReadOnScroll, infoFrom, isUnread])
+  }, [entry, markReadOnScroll, infoFrom, isUnread, scrollRootRef, handleToggleStatus])
 
   return (
     <Dropdown

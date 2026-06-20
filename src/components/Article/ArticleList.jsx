@@ -1,7 +1,15 @@
 import { Divider, Spin } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react"
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { useInView } from "react-intersection-observer"
 import SimpleBar from "simplebar-react"
 import { Virtualizer } from "virtua"
@@ -47,25 +55,32 @@ const LoadMoreComponent = ({ getEntries }) => {
   )
 }
 
-const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref) => {
+const ArticleList = forwardRef(({ getEntries, handleEntryClick }, ref) => {
   const { isArticleListReady, loadMoreVisible } = useStore(contentState)
   const filteredEntries = useStore(filteredEntriesState)
   const wrapperRef = useRef(null)
+  const simpleBarRef = useRef(null)
+  const scrollContainerRef = useRef(null)
+  const [scrollRoot, setScrollRoot] = useState(null)
 
   const { loadingMore, handleLoadMore } = useLoadMore()
   const canLoadMore = loadMoreVisible && isArticleListReady && !loadingMore
 
-  useImperativeHandle(
-    ref,
-    () =>
-      IS_IOS_SAFARI
-        ? {
-            contentWrapperEl: cardsRef.current,
-            el: wrapperRef.current,
-          }
-        : null,
-    [cardsRef],
-  )
+  const mergeScrollRef = useCallback((node) => {
+    scrollContainerRef.current = node
+    setScrollRoot(node)
+  }, [])
+
+  useImperativeHandle(ref, () => {
+    if (IS_IOS_SAFARI) {
+      return {
+        contentWrapperEl: scrollContainerRef.current,
+        el: wrapperRef.current,
+      }
+    }
+
+    return simpleBarRef.current
+  }, [])
 
   const checkAndLoadMore = useMemo(
     () =>
@@ -93,7 +108,7 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
   const renderEntries = () =>
     filteredEntries.map((entry, index) => (
       <div key={entry.id}>
-        <ArticleCard entry={entry} handleEntryClick={handleEntryClick} scrollRootRef={cardsRef}>
+        <ArticleCard entry={entry} handleEntryClick={handleEntryClick} scrollRoot={scrollRoot}>
           <Ripple color="var(--color-text-4)" duration={1000} />
         </ArticleCard>
         {index < filteredEntries.length - 1 && (
@@ -117,9 +132,9 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
           ) : (
             <Virtualizer
               overscan={10}
-              scrollRef={cardsRef}
+              scrollRef={scrollContainerRef}
               onScroll={() => {
-                const element = cardsRef.current
+                const element = scrollContainerRef.current
                 if (element) {
                   checkAndLoadMore(element)
                 }
@@ -137,7 +152,7 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
   if (IS_IOS_SAFARI) {
     return (
       <div ref={wrapperRef} className="entry-list-wrapper">
-        <div ref={cardsRef} className="entry-list entry-list-native" onScroll={handleScroll}>
+        <div ref={mergeScrollRef} className="entry-list entry-list-native" onScroll={handleScroll}>
           {listBody}
         </div>
       </div>
@@ -145,7 +160,11 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
   }
 
   return (
-    <SimpleBar ref={ref} className="entry-list" scrollableNodeProps={{ ref: cardsRef }}>
+    <SimpleBar
+      ref={simpleBarRef}
+      className="entry-list"
+      scrollableNodeProps={{ ref: mergeScrollRef }}
+    >
       {listBody}
     </SimpleBar>
   )

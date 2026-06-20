@@ -22,7 +22,7 @@ import { settingsState } from "@/store/settingsState"
 import { generateReadingTime, generateRelativeTime } from "@/utils/date"
 import "./ArticleCard.css"
 
-const ArticleCard = ({ entry, handleEntryClick, children, scrollRootRef }) => {
+const ArticleCard = ({ entry, handleEntryClick, children, scrollRoot }) => {
   const {
     enableContextMenu,
     markReadOnScroll,
@@ -63,54 +63,47 @@ const ArticleCard = ({ entry, handleEntryClick, children, scrollRootRef }) => {
 
   const wasVisible = useRef(false)
   const cardRef = useRef(null)
+  const handleToggleStatusRef = useRef(handleToggleStatus)
 
   useEffect(() => {
-    // If the article is read or scroll marking is not enabled, no observation needed
+    handleToggleStatusRef.current = handleToggleStatus
+  }, [handleToggleStatus])
+
+  useEffect(() => {
     if (!isUnread || !markReadOnScroll || infoFrom === "history") {
       return
     }
 
-    const scrollRoot =
-      scrollRootRef?.current ??
-      document.querySelector(".entry-list .simplebar-content-wrapper") ??
-      document.querySelector(".entry-list-native")
-
-    if (!scrollRoot) {
+    const card = cardRef.current
+    if (!scrollRoot || !card) {
       return
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const observerEntry of entries) {
-          const { boundingClientRect, rootBounds, isIntersecting } = observerEntry
+    wasVisible.current = false
 
-          // Record status when the article enters the viewport
-          if (isIntersecting) {
-            wasVisible.current = true
-          } else if (wasVisible.current && boundingClientRect.top < rootBounds.top) {
-            // Only mark as read when the card is completely above the viewport top and was previously visible
-            handleToggleStatus(entry)
-            observer.unobserve(observerEntry.target)
-          }
-        }
-      },
-      {
-        root: scrollRoot,
-        threshold: 0.2,
-      },
-    )
+    const checkVisibility = () => {
+      const rootRect = scrollRoot.getBoundingClientRect()
+      const cardRect = card.getBoundingClientRect()
+      const isVisible = cardRect.bottom > rootRect.top && cardRect.top < rootRect.bottom
 
-    const element = cardRef.current
-    if (element) {
-      observer.observe(element)
-    }
+      if (isVisible) {
+        wasVisible.current = true
+        return
+      }
 
-    return () => {
-      if (element) {
-        observer.unobserve(element)
+      if (wasVisible.current && cardRect.bottom <= rootRect.top) {
+        handleToggleStatusRef.current(entry)
+        scrollRoot.removeEventListener("scroll", checkVisibility)
       }
     }
-  }, [entry, markReadOnScroll, infoFrom, isUnread, scrollRootRef, handleToggleStatus])
+
+    scrollRoot.addEventListener("scroll", checkVisibility, { passive: true })
+    checkVisibility()
+
+    return () => {
+      scrollRoot.removeEventListener("scroll", checkVisibility)
+    }
+  }, [entry, markReadOnScroll, infoFrom, isUnread, scrollRoot])
 
   return (
     <Dropdown

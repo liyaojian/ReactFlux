@@ -3,12 +3,10 @@ import { ofetch } from "ofetch"
 import router from "@/routes"
 import { authState } from "@/store/authState"
 import isValidAuth from "@/utils/auth"
-import normalizeFetchError from "@/utils/fetch-error"
 
 // 创建 ofetch 实例并设置默认配置
 const createApiClient = () => {
   return ofetch.create({
-    mode: "cors",
     retry: 3, // 默认重试次数
     onRequest({ _request, options }) {
       const auth = authState.get()
@@ -24,7 +22,6 @@ const createApiClient = () => {
     onRequestError({ _request, _options, error }) {
       // 处理请求错误
       console.error("Request error:", error)
-      throw normalizeFetchError(error, authState.get().server)
     },
     async onResponseError({ _request, response, _options }) {
       const statusCode = response.status

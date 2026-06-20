@@ -51,21 +51,21 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
   const { isArticleListReady, loadMoreVisible } = useStore(contentState)
   const filteredEntries = useStore(filteredEntriesState)
   const wrapperRef = useRef(null)
-  const simpleBarRef = useRef(null)
 
   const { loadingMore, handleLoadMore } = useLoadMore()
   const canLoadMore = loadMoreVisible && isArticleListReady && !loadingMore
 
-  useImperativeHandle(ref, () => {
-    if (IS_IOS_SAFARI) {
-      return {
-        contentWrapperEl: cardsRef.current,
-        el: wrapperRef.current,
-      }
-    }
-
-    return simpleBarRef.current
-  }, [cardsRef])
+  useImperativeHandle(
+    ref,
+    () =>
+      IS_IOS_SAFARI
+        ? {
+            contentWrapperEl: cardsRef.current,
+            el: wrapperRef.current,
+          }
+        : null,
+    [cardsRef],
+  )
 
   const checkAndLoadMore = useMemo(
     () =>
@@ -145,7 +145,7 @@ const ArticleList = forwardRef(({ getEntries, handleEntryClick, cardsRef }, ref)
   }
 
   return (
-    <SimpleBar ref={simpleBarRef} className="entry-list" scrollableNodeProps={{ ref: cardsRef }}>
+    <SimpleBar ref={ref} className="entry-list" scrollableNodeProps={{ ref: cardsRef }}>
       {listBody}
     </SimpleBar>
   )

@@ -13,11 +13,7 @@ const useFeedIconsSync = () => {
   useEffect(() => {
     setEntries((prev) =>
       prev.map((entry) => {
-        const feedIconId = entry.feed.icon?.icon_id
-        if (!feedIconId) {
-          return entry
-        }
-
+        const feedIconId = entry.feed.icon.icon_id
         const feedIcon = feedIcons[feedIconId]
         if (entry.isMedia && feedIcon?.width) {
           return {

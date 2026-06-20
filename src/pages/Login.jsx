@@ -20,7 +20,6 @@ import useTheme from "@/hooks/useTheme"
 import { authState, setAuth } from "@/store/authState"
 import { settingsState } from "@/store/settingsState"
 import isValidAuth from "@/utils/auth"
-import normalizeFetchError from "@/utils/fetch-error"
 import { handleEnterKeyToSubmit, validateAndFormatFormFields } from "@/utils/form"
 import hideSpinner from "@/utils/loading"
 import "./Login.css"
@@ -64,10 +63,9 @@ const Login = () => {
       }
     } catch (error) {
       console.error(error)
-      const normalizedError = normalizeFetchError(error, server)
       Notification.error({
         title: polyglot.t("login.error"),
-        content: normalizedError.message,
+        content: error.message,
       })
     }
     setLoading(false)

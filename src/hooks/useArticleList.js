@@ -1,4 +1,3 @@
-import { Message } from "@arco-design/web-react"
 import { useStore } from "@nanostores/react"
 import { useEffect, useRef } from "react"
 
@@ -106,7 +105,6 @@ const useArticleList = (info, getEntries) => {
       handleResponses(response)
     } catch (error) {
       console.error("Error fetching articles:", error)
-      Message.error(error.message || "Failed to load articles")
     } finally {
       isLoading.current = false
       setIsArticleListReady(true)

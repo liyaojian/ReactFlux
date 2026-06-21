@@ -126,7 +126,8 @@
     "filter_headings": "Filtrer les titres"
   },
   "content": {
-    "mark_as_read_error": "Impossible de marquer comme lu, veuillez réessayer plus tard"
+    "mark_as_read_error": "Impossible de marquer comme lu, veuillez réessayer plus tard",
+    "swipe_open_link_prompt_title": "Ouvrir le lien d'origine ?"
   },
   "deduplicate": {
     "mark_as_read_error": "Impossible de marquer les articles en double comme lus"
@@ -275,7 +276,7 @@
     "compact_sidebar_groups_description": "Limiter la hauteur du groupe de flux pour éviter les longues listes de défilement (recommandé pour les performances avec de nombreux flux)",
     "enable_swipe_gesture_description": "Activer le geste de balayage pour changer d'article",
     "enable_swipe_gesture_label": "Activer le geste de balayage",
-    "enable_swipe_left_to_open_link_description": "Utiliser le balayage vers la gauche pour ouvrir le lien d'origine dans un nouvel onglet",
+    "enable_swipe_left_to_open_link_description": "Afficher une barre de confirmation après un balayage vers la gauche ; appuyer pour ouvrir le lien d'origine dans un nouvel onglet",
     "enable_swipe_left_to_open_link_label": "Balayage gauche ouvre le lien d'origine",
     "swipe_sensitivity_description": "Ajuster la sensibilité des gestes de balayage",
     "swipe_sensitivity_label": "Sensibilité du balayage",

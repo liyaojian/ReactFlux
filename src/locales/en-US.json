@@ -128,7 +128,8 @@
     "filter_headings": "Filter headings"
   },
   "content": {
-    "mark_as_read_error": "Failed to mark as read, please try again later"
+    "mark_as_read_error": "Failed to mark as read, please try again later",
+    "swipe_open_link_prompt_title": "Open original link?"
   },
   "deduplicate": {
     "mark_as_read_error": "Failed to mark duplicate articles as read"
@@ -275,7 +276,7 @@
     "enable_context_menu_description": "Enable right-click context menu on article cards",
     "enable_swipe_gesture_description": "Enable swipe gesture to switch articles",
     "enable_swipe_gesture_label": "Enable swipe gesture",
-    "enable_swipe_left_to_open_link_description": "Use left swipe to open the original link in a new browser tab",
+    "enable_swipe_left_to_open_link_description": "Show a confirmation bar after left swipe; tap to open the original link in a new tab",
     "enable_swipe_left_to_open_link_label": "Left swipe opens original link",
     "swipe_sensitivity_description": "Adjust the sensitivity of swipe gestures",
     "swipe_sensitivity_label": "Swipe sensitivity",

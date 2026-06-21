@@ -13,6 +13,7 @@ import ActionButtons from "@/components/Article/ActionButtons"
 import ArticleDetail from "@/components/Article/ArticleDetail"
 import ArticleList from "@/components/Article/ArticleList"
 import SearchAndSortBar from "@/components/Article/SearchAndSortBar"
+import SwipeOpenLinkPrompt from "@/components/Content/SwipeOpenLinkPrompt"
 import FadeTransition from "@/components/ui/FadeTransition"
 import useAppData from "@/hooks/useAppData"
 import useArticleList from "@/hooks/useArticleList"
@@ -32,7 +33,6 @@ import {
 import { dataState } from "@/store/dataState"
 import { duplicateHotkeysState } from "@/store/hotkeysState"
 import { settingsState } from "@/store/settingsState"
-import { openInCurrentTab } from "@/utils/dom"
 
 import "./Content.css"
 
@@ -53,6 +53,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
 
   const [isSwipingLeft, setIsSwipingLeft] = useState(false)
   const [isSwipingRight, setIsSwipingRight] = useState(false)
+  const [swipeOpenLinkPromptVisible, setSwipeOpenLinkPromptVisible] = useState(false)
   const cardsRef = useRef(null)
 
   const location = useLocation()
@@ -117,20 +118,14 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
   const handleSwipeLeft = useCallback(() => {
     if (enableSwipeLeftToOpenLink) {
       if (isBelowMedium) {
-        openInCurrentTab(activeContent?.url)
+        setSwipeOpenLinkPromptVisible(true)
       } else {
         openLinkExternally()
       }
       return
     }
     navigateToNextArticle()
-  }, [
-    activeContent,
-    enableSwipeLeftToOpenLink,
-    isBelowMedium,
-    navigateToNextArticle,
-    openLinkExternally,
-  ])
+  }, [enableSwipeLeftToOpenLink, isBelowMedium, navigateToNextArticle, openLinkExternally])
 
   const handleSwipeRight = useCallback(() => {
     if (enableSwipeLeftToOpenLink) {
@@ -153,6 +148,10 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
     onSwipedLeft: enableSwipeGesture ? handleSwipeLeft : undefined,
     onSwipedRight: enableSwipeGesture && !enableSwipeLeftToOpenLink ? handleSwipeRight : undefined,
   })
+
+  useEffect(() => {
+    setSwipeOpenLinkPromptVisible(false)
+  }, [activeContent?.id])
 
   useEffect(() => {
     if (duplicateHotkeys.length > 0) {
@@ -288,6 +287,13 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
           </Typography.Title>
         </div>
       )}
+      <SwipeOpenLinkPrompt
+        polyglot={polyglot}
+        title={activeContent?.title}
+        url={activeContent?.url}
+        visible={swipeOpenLinkPromptVisible}
+        onClose={() => setSwipeOpenLinkPromptVisible(false)}
+      />
     </>
   )
 }

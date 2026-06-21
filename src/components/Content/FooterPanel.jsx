@@ -1,4 +1,4 @@
-import { Button, Notification, Popconfirm, Radio } from "@arco-design/web-react"
+import { Button, Notification, Radio } from "@arco-design/web-react"
 import {
   IconAlignLeft,
   IconCheck,
@@ -137,21 +137,16 @@ const FooterPanel = ({ info, refreshArticleList, markAllAsRead }) => {
 
   return (
     <div className="entry-panel">
-      <Popconfirm
-        focusLock
-        title={polyglot.t("article_list.mark_all_as_read_confirm")}
-        onOk={handleMarkAllAsRead}
-      >
-        <CustomTooltip mini content={polyglot.t("article_list.mark_all_as_read_tooltip")}>
-          <Button
-            icon={<IconCheck />}
-            shape="circle"
-            style={{
-              visibility: ["starred", "history"].includes(info.from) ? "hidden" : "visible",
-            }}
-          />
-        </CustomTooltip>
-      </Popconfirm>
+      <CustomTooltip mini content={polyglot.t("article_list.mark_all_as_read_tooltip")}>
+        <Button
+          icon={<IconCheck />}
+          shape="circle"
+          style={{
+            visibility: ["starred", "history"].includes(info.from) ? "hidden" : "visible",
+          }}
+          onClick={handleMarkAllAsRead}
+        />
+      </CustomTooltip>
       <Radio.Group
         style={{ visibility: info.from === "history" ? "hidden" : "visible" }}
         type="button"

@@ -683,10 +683,6 @@ const Sidebar = () => {
       ) {
         updateAllEntriesAsRead()
       }
-
-      Notification.success({
-        title: polyglot.t("article_list.mark_all_as_read_success"),
-      })
     } catch {
       Notification.error({
         title: polyglot.t("article_list.mark_all_as_read_error"),

@@ -90,10 +90,6 @@ const FooterPanel = ({ info, refreshArticleList, markAllAsRead }) => {
     if (info.from === "today") {
       setUnreadTodayCount(0)
     }
-
-    Notification.success({
-      title: polyglot.t("article_list.mark_all_as_read_success"),
-    })
   }
 
   const baseFilterOptions = [

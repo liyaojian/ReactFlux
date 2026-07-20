@@ -138,9 +138,6 @@ export const useFeedOperations = (useNotification = false) => {
       if (infoFrom === "feed" && feed.id === Number(infoId)) {
         setEntries((prev) => prev.map((entry) => ({ ...entry, status: "read" })))
       }
-
-      const successMessage = polyglot.t("article_list.mark_all_as_read_success")
-      showMessage(successMessage)
     } catch (error) {
       console.error("Failed to mark feed as read:", error)
       const errorMessage = polyglot.t("article_list.mark_all_as_read_error")

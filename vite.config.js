@@ -21,6 +21,34 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "autoUpdate",
+      manifest: {
+        id: "/",
+        name: "ReactFlux",
+        short_name: "ReactFlux",
+        description: "A Simple but Powerful RSS Reader for Miniflux",
+        start_url: "/",
+        scope: "/",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#1F2327",
+        icons: [
+          {
+            src: "/favicon.ico",
+            sizes: "64x64",
+            type: "image/x-icon",
+          },
+          {
+            src: "/logo192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/logo512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
       devOptions: {
         enabled: false,
       },

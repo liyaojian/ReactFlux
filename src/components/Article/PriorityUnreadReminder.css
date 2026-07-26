@@ -1,0 +1,69 @@
+.priority-unread-reminder {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .priority-unread-reminder {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+    border: 0;
+    border-top: 1px solid rgb(var(--warning-3));
+    border-bottom: 1px solid rgb(var(--warning-3));
+    border-radius: 0;
+    background-color: rgb(var(--warning-1));
+    padding: 8px 12px;
+    width: 100%;
+    min-height: 40px;
+    color: var(--color-text-2);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .priority-unread-reminder:active {
+    background-color: rgb(var(--warning-2));
+  }
+
+  .priority-unread-reminder:focus-visible {
+    outline: 2px solid rgb(var(--primary-6));
+    outline-offset: -2px;
+  }
+
+  .priority-unread-reminder__label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .priority-unread-reminder__label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .priority-unread-reminder__star {
+    flex: none;
+    color: rgb(var(--warning-6));
+    font-size: 16px;
+  }
+
+  .priority-unread-reminder__count,
+  .priority-unread-reminder__arrow {
+    flex: none;
+  }
+
+  .priority-unread-reminder__count {
+    font-size: 0.875rem;
+  }
+
+  .priority-unread-reminder__arrow {
+    color: var(--color-text-3);
+    font-size: 14px;
+  }
+}

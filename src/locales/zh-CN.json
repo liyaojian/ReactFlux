@@ -124,6 +124,7 @@
     "mark_all_as_read_error": "无法标记所有文章为已读",
     "mark_all_as_read_confirm": "标记所有文章为已读？",
     "mark_all_as_read_tooltip": "标记所有文章为已读",
+    "priority_unread_count": "%{count} 篇未读",
     "refresh_tooltip": "刷新"
   },
   "article_toc": {

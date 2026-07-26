@@ -2,7 +2,7 @@ import { persistentAtom } from "@nanostores/persistent"
 import { computed } from "nanostores"
 
 import { authState } from "./authState"
-import { dataState } from "./dataState"
+import { dataState, filteredFeedsState } from "./dataState"
 
 const normalizeStoredAccounts = (value) => {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -46,6 +46,18 @@ const currentAccountKeyState = computed([authState, dataState], (auth, data) => 
 export const priorityFeedIdsState = computed(
   [priorityFeedsByAccountState, currentAccountKeyState],
   (priorityFeedsByAccount, accountKey) => priorityFeedsByAccount[accountKey] ?? [],
+)
+
+export const priorityUnreadCountState = computed(
+  [priorityFeedIdsState, filteredFeedsState],
+  (priorityFeedIds, filteredFeeds) => {
+    const priorityFeedIdSet = new Set(priorityFeedIds)
+
+    return filteredFeeds.reduce(
+      (total, feed) => total + (priorityFeedIdSet.has(feed.id) ? feed.unreadCount : 0),
+      0,
+    )
+  },
 )
 
 const updateCurrentAccountFeedIds = (updater) => {

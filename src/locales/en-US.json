@@ -124,6 +124,7 @@
     "mark_all_as_read_error": "Failed to mark all as read",
     "mark_all_as_read_confirm": "Mark all as read?",
     "mark_all_as_read_tooltip": "Mark all as read",
+    "priority_unread_count": "%{count} unread",
     "refresh_tooltip": "Refresh"
   },
   "article_toc": {

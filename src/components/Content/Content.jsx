@@ -12,6 +12,7 @@ import { getEntry } from "@/apis"
 import ActionButtons from "@/components/Article/ActionButtons"
 import ArticleDetail from "@/components/Article/ArticleDetail"
 import ArticleList from "@/components/Article/ArticleList"
+import PriorityUnreadReminder from "@/components/Article/PriorityUnreadReminder"
 import SearchAndSortBar from "@/components/Article/SearchAndSortBar"
 import SwipeOpenLinkPrompt from "@/components/Content/SwipeOpenLinkPrompt"
 import FadeTransition from "@/components/ui/FadeTransition"
@@ -258,6 +259,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
         }}
       >
         <SearchAndSortBar />
+        <PriorityUnreadReminder />
         <ArticleList
           ref={entryListRef}
           cardsRef={cardsRef}

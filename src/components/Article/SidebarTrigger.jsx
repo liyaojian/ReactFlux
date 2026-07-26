@@ -1,33 +1,29 @@
 import { Button, Drawer } from "@arco-design/web-react"
 import { IconMenu } from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
-import { atom } from "nanostores"
 import { useEffect } from "react"
 import { useLocation } from "react-router"
 
 import Sidebar from "@/components/Sidebar/Sidebar"
 import useScreenWidth from "@/hooks/useScreenWidth"
+import { setSidebarDrawerVisible, sidebarDrawerVisibleState } from "@/store/sidebarState"
 import "./SidebarTrigger.css"
-import createSetter from "@/utils/nanostores"
-
-const sidebarVisibleState = atom(false)
-const setSidebarVisible = createSetter(sidebarVisibleState)
 
 export default function SidebarTrigger() {
   const currentPath = useLocation().pathname
   const { isBelowLarge } = useScreenWidth()
 
-  const sidebarVisible = useStore(sidebarVisibleState)
+  const sidebarVisible = useStore(sidebarDrawerVisibleState)
 
   useEffect(() => {
     if (!isBelowLarge) {
-      setSidebarVisible(false)
+      setSidebarDrawerVisible(false)
     }
   }, [isBelowLarge])
 
   useEffect(() => {
     if (currentPath) {
-      setSidebarVisible(false)
+      setSidebarDrawerVisible(false)
     }
   }, [currentPath])
 
@@ -38,7 +34,7 @@ export default function SidebarTrigger() {
           className="trigger"
           shape="circle"
           size="small"
-          onClick={() => setSidebarVisible(!sidebarVisible)}
+          onClick={() => setSidebarDrawerVisible(!sidebarVisible)}
         >
           <IconMenu />
         </Button>
@@ -51,7 +47,7 @@ export default function SidebarTrigger() {
         title={null}
         visible={sidebarVisible}
         width={240}
-        onCancel={() => setSidebarVisible(false)}
+        onCancel={() => setSidebarDrawerVisible(false)}
       >
         <Sidebar />
       </Drawer>

@@ -33,8 +33,12 @@ import {
 import { dataState } from "@/store/dataState"
 import { duplicateHotkeysState } from "@/store/hotkeysState"
 import { settingsState } from "@/store/settingsState"
+import { setSidebarDrawerVisible } from "@/store/sidebarState"
 
 import "./Content.css"
+
+const SIDEBAR_SWIPE_EDGE_WIDTH = 32
+const SIDEBAR_SWIPE_MIN_DISTANCE = 56
 
 const Content = ({ info, getEntries, markAllAsRead }) => {
   const { activeContent, entries, filterDate, filterString, isArticleLoading } =
@@ -149,6 +153,20 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
     onSwipedRight: enableSwipeGesture && !enableSwipeLeftToOpenLink ? handleSwipeRight : undefined,
   })
 
+  const sidebarSwipeHandlers = useSwipeable({
+    delta: SIDEBAR_SWIPE_MIN_DISTANCE,
+    onSwipedRight: ({ initial }) => {
+      if (
+        isBelowMedium &&
+        !params.entryId &&
+        !activeContent &&
+        initial[0] <= SIDEBAR_SWIPE_EDGE_WIDTH
+      ) {
+        setSidebarDrawerVisible(true)
+      }
+    },
+  })
+
   useEffect(() => {
     setSwipeOpenLinkPromptVisible(false)
   }, [activeContent?.id])
@@ -233,6 +251,7 @@ const Content = ({ info, getEntries, markAllAsRead }) => {
   return (
     <>
       <div
+        {...sidebarSwipeHandlers}
         className="entry-col"
         style={{
           opacity: isBelowMedium && isArticleLoading ? 0 : 1,

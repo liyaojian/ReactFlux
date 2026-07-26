@@ -1,4 +1,5 @@
 import { persistentAtom } from "@nanostores/persistent"
+import { atom } from "nanostores"
 
 import { settingsState } from "./settingsState"
 
@@ -13,6 +14,8 @@ export const priorityFeedsExpandedState = persistentAtom("priorityFeedsExpanded"
   encode: String,
   decode: (value) => value !== "false",
 })
+
+export const sidebarDrawerVisibleState = atom(false)
 
 export const lastVisitedPathState = persistentAtom("lastVisitedPath", "", {
   encode: (value) => value,
@@ -47,4 +50,8 @@ export const setExpandedCategories = (keys) => {
 
 export const setPriorityFeedsExpanded = (expanded) => {
   priorityFeedsExpandedState.set(expanded)
+}
+
+export const setSidebarDrawerVisible = (visible) => {
+  sidebarDrawerVisibleState.set(visible)
 }

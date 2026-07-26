@@ -25,6 +25,7 @@ import {
   IconRefresh,
   IconRight,
   IconStar,
+  IconStarFill,
   IconUnorderedList,
   IconUpload,
 } from "@arco-design/web-react/icon"
@@ -53,11 +54,18 @@ import {
   dataState,
   feedsGroupedByIdState,
   filteredCategoriesState,
+  filteredFeedsState,
   setUnreadInfo,
   unreadTotalState,
 } from "@/store/dataState"
+import { priorityFeedIdsState, togglePriorityFeed } from "@/store/priorityFeedsState"
 import { settingsState, updateSettings } from "@/store/settingsState"
-import { expandedCategoriesState, setExpandedCategories } from "@/store/sidebarState"
+import {
+  expandedCategoriesState,
+  priorityFeedsExpandedState,
+  setExpandedCategories,
+  setPriorityFeedsExpanded,
+} from "@/store/sidebarState"
 import { IS_IOS_SAFARI } from "@/utils/platform"
 
 import "./Sidebar.css"
@@ -248,9 +256,18 @@ const SidebarMenuItems = () => {
   )
 }
 
-const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDeleteFeed }) => {
+const FeedMenuItem = ({
+  feed,
+  onEditFeed,
+  onRefreshFeed,
+  onMarkAllAsRead,
+  onDeleteFeed,
+  showPriorityIndicator = true,
+}) => {
   const { showFeedIcon } = useStore(settingsState)
   const { polyglot } = useStore(polyglotState)
+  const priorityFeedIds = useStore(priorityFeedIdsState)
+  const isPriorityFeed = priorityFeedIds.includes(feed.id)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -267,6 +284,19 @@ const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDele
             <div className="settings-menu-item">
               <span>{polyglot.t("sidebar.context_menu.edit_feed")}</span>
               <IconEdit />
+            </div>
+          </MenuItem>
+
+          <MenuItem key="toggle-priority-feed" onClick={() => togglePriorityFeed(feed.id)}>
+            <div className="settings-menu-item">
+              <span>
+                {polyglot.t(
+                  isPriorityFeed
+                    ? "sidebar.context_menu.remove_priority_feed"
+                    : "sidebar.context_menu.add_priority_feed",
+                )}
+              </span>
+              {isPriorityFeed ? <IconStarFill /> : <IconStar />}
             </div>
           </MenuItem>
 
@@ -316,6 +346,9 @@ const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDele
               boxSizing: "border-box",
             }}
           >
+            {showPriorityIndicator && isPriorityFeed && (
+              <IconStarFill className="priority-feed-icon" />
+            )}
             {showFeedIcon && <FeedIcon className="feed-icon-sidebar" feed={feed} />}
             {feed.title}
           </Typography.Ellipsis>
@@ -330,41 +363,22 @@ const FeedMenuItem = ({ feed, onEditFeed, onRefreshFeed, onMarkAllAsRead, onDele
   )
 }
 
-const FeedMenuGroup = ({
-  categoryId,
+const FeedMenuItems = ({
+  feeds,
   onEditFeed,
   onRefreshFeed,
   onMarkAllAsRead,
   onDeleteFeed,
+  showPriorityIndicator,
 }) => {
-  const { showUnreadFeedsOnly } = useStore(settingsState)
-  const feedsGroupedById = useStore(feedsGroupedByIdState)
-
   const parentRef = useRef(null)
   const scrollableNodeRef = useRef(null)
 
-  const filteredFeeds = useMemo(() => {
-    const feeds =
-      feedsGroupedById[categoryId]?.filter(
-        (feed) => !showUnreadFeedsOnly || feed.unreadCount > 0,
-      ) || []
-
-    return feeds
-      .map((feed, index) => ({ feed, index }))
-      .toSorted((itemA, itemB) => {
-        if (itemB.feed.unreadCount !== itemA.feed.unreadCount) {
-          return itemB.feed.unreadCount - itemA.feed.unreadCount
-        }
-
-        return itemA.index - itemB.index
-      })
-      .map(({ feed }) => feed)
-  }, [feedsGroupedById, categoryId, showUnreadFeedsOnly])
-
-  const feedItems = filteredFeeds.map((feed) => (
+  const feedItems = feeds.map((feed) => (
     <FeedMenuItem
       key={feed.id}
       feed={feed}
+      showPriorityIndicator={showPriorityIndicator}
       onDeleteFeed={onDeleteFeed}
       onEditFeed={onEditFeed}
       onMarkAllAsRead={onMarkAllAsRead}
@@ -392,6 +406,112 @@ const FeedMenuGroup = ({
         {feedItems}
       </Virtualizer>
     </SimpleBar>
+  )
+}
+
+const FeedMenuGroup = ({
+  categoryId,
+  onEditFeed,
+  onRefreshFeed,
+  onMarkAllAsRead,
+  onDeleteFeed,
+}) => {
+  const { showUnreadFeedsOnly } = useStore(settingsState)
+  const feedsGroupedById = useStore(feedsGroupedByIdState)
+
+  const filteredFeeds = useMemo(() => {
+    const feeds =
+      feedsGroupedById[categoryId]?.filter(
+        (feed) => !showUnreadFeedsOnly || feed.unreadCount > 0,
+      ) || []
+
+    return feeds
+      .map((feed, index) => ({ feed, index }))
+      .toSorted((itemA, itemB) => {
+        if (itemB.feed.unreadCount !== itemA.feed.unreadCount) {
+          return itemB.feed.unreadCount - itemA.feed.unreadCount
+        }
+
+        return itemA.index - itemB.index
+      })
+      .map(({ feed }) => feed)
+  }, [feedsGroupedById, categoryId, showUnreadFeedsOnly])
+
+  return (
+    <FeedMenuItems
+      feeds={filteredFeeds}
+      onDeleteFeed={onDeleteFeed}
+      onEditFeed={onEditFeed}
+      onMarkAllAsRead={onMarkAllAsRead}
+      onRefreshFeed={onRefreshFeed}
+    />
+  )
+}
+
+const PRIORITY_FEEDS_GROUP_KEY = "priority-feeds"
+
+const PriorityFeedGroup = ({ onEditFeed, onRefreshFeed, onMarkAllAsReadFeed, onDeleteFeed }) => {
+  const { showUnreadFeedsOnly } = useStore(settingsState)
+  const { polyglot } = useStore(polyglotState)
+  const filteredFeeds = useStore(filteredFeedsState)
+  const priorityFeedIds = useStore(priorityFeedIdsState)
+  const priorityFeedsExpanded = useStore(priorityFeedsExpandedState)
+
+  const visiblePriorityFeeds = useMemo(() => {
+    const priorityFeedIdSet = new Set(priorityFeedIds)
+
+    return filteredFeeds
+      .filter(
+        (feed) => priorityFeedIdSet.has(feed.id) && (!showUnreadFeedsOnly || feed.unreadCount > 0),
+      )
+      .map((feed, index) => ({ feed, index }))
+      .toSorted((itemA, itemB) => {
+        if (itemB.feed.unreadCount !== itemA.feed.unreadCount) {
+          return itemB.feed.unreadCount - itemA.feed.unreadCount
+        }
+
+        return itemA.index - itemB.index
+      })
+      .map(({ feed }) => feed)
+  }, [filteredFeeds, priorityFeedIds, showUnreadFeedsOnly])
+
+  if (visiblePriorityFeeds.length === 0) {
+    return null
+  }
+
+  const unreadCount = visiblePriorityFeeds.reduce((total, feed) => total + feed.unreadCount, 0)
+
+  return (
+    <Collapse
+      activeKey={priorityFeedsExpanded ? [PRIORITY_FEEDS_GROUP_KEY] : []}
+      bordered={false}
+      className="priority-feed-group"
+      triggerRegion="header"
+      onChange={(_key, keys) => setPriorityFeedsExpanded(keys.includes(PRIORITY_FEEDS_GROUP_KEY))}
+    >
+      <Collapse.Item
+        expandIcon={<IconRight />}
+        name={PRIORITY_FEEDS_GROUP_KEY}
+        header={
+          <div className="category-title priority-feed-title">
+            <span className="priority-feed-title-label">
+              <IconStarFill className="priority-feed-icon" />
+              {polyglot.t("sidebar.priority_feeds")}
+            </span>
+            {unreadCount > 0 && <CountDisplay count={unreadCount} />}
+          </div>
+        }
+      >
+        <FeedMenuItems
+          feeds={visiblePriorityFeeds}
+          showPriorityIndicator={false}
+          onDeleteFeed={onDeleteFeed}
+          onEditFeed={onEditFeed}
+          onMarkAllAsRead={onMarkAllAsReadFeed}
+          onRefreshFeed={onRefreshFeed}
+        />
+      </Collapse.Item>
+    </Collapse>
   )
 }
 
@@ -478,6 +598,24 @@ const CategoryGroup = ({
       />
     </Collapse.Item>
   ))
+}
+
+const SidebarFeedGroups = (props) => {
+  const expandedCategories = useStore(expandedCategoriesState)
+
+  return (
+    <>
+      <PriorityFeedGroup {...props} />
+      <Collapse
+        activeKey={expandedCategories}
+        bordered={false}
+        triggerRegion="icon"
+        onChange={(_key, keys) => setExpandedCategories(keys)}
+      >
+        <CategoryGroup {...props} />
+      </Collapse>
+    </>
+  )
 }
 
 const readFileAsText = async (file) => {
@@ -621,7 +759,6 @@ const updateAllEntriesAsRead = () => {
 const Sidebar = () => {
   const { isCoreDataReady } = useStore(dataState)
   const { polyglot } = useStore(polyglotState)
-  const expandedCategories = useStore(expandedCategoriesState)
 
   const [categoryModalVisible, setCategoryModalVisible] = useState(false)
   const [feedModalVisible, setFeedModalVisible] = useState(false)
@@ -754,23 +891,16 @@ const Sidebar = () => {
             </div>
             <Skeleton animation={true} loading={!isCoreDataReady} text={{ rows: 6 }} />
             {isCoreDataReady && (
-              <Collapse
-                activeKey={expandedCategories}
-                bordered={false}
-                triggerRegion="icon"
-                onChange={(_key, keys) => setExpandedCategories(keys)}
-              >
-                <CategoryGroup
-                  onDeleteCategory={handleDeleteCategory}
-                  onDeleteFeed={handleDeleteFeed}
-                  onEditCategory={handleEditCategory}
-                  onEditFeed={handleEditFeed}
-                  onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
-                  onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
-                  onRefreshCategory={handleRefreshCategory}
-                  onRefreshFeed={handleRefreshFeed}
-                />
-              </Collapse>
+              <SidebarFeedGroups
+                onDeleteCategory={handleDeleteCategory}
+                onDeleteFeed={handleDeleteFeed}
+                onEditCategory={handleEditCategory}
+                onEditFeed={handleEditFeed}
+                onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
+                onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
+                onRefreshCategory={handleRefreshCategory}
+                onRefreshFeed={handleRefreshFeed}
+              />
             )}
           </Menu>
         </div>
@@ -813,23 +943,16 @@ const Sidebar = () => {
             </div>
             <Skeleton animation={true} loading={!isCoreDataReady} text={{ rows: 6 }} />
             {isCoreDataReady && (
-              <Collapse
-                activeKey={expandedCategories}
-                bordered={false}
-                triggerRegion="icon"
-                onChange={(_key, keys) => setExpandedCategories(keys)}
-              >
-                <CategoryGroup
-                  onDeleteCategory={handleDeleteCategory}
-                  onDeleteFeed={handleDeleteFeed}
-                  onEditCategory={handleEditCategory}
-                  onEditFeed={handleEditFeed}
-                  onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
-                  onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
-                  onRefreshCategory={handleRefreshCategory}
-                  onRefreshFeed={handleRefreshFeed}
-                />
-              </Collapse>
+              <SidebarFeedGroups
+                onDeleteCategory={handleDeleteCategory}
+                onDeleteFeed={handleDeleteFeed}
+                onEditCategory={handleEditCategory}
+                onEditFeed={handleEditFeed}
+                onMarkAllAsReadCategory={handleMarkAllAsReadCategory}
+                onMarkAllAsReadFeed={handleMarkAllAsReadFeed}
+                onRefreshCategory={handleRefreshCategory}
+                onRefreshFeed={handleRefreshFeed}
+              />
             )}
           </Menu>
         </SimpleBar>

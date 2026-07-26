@@ -72,6 +72,28 @@
   height: 16px;
 }
 
+.priority-feed-icon {
+  flex: none;
+  margin-right: 6px;
+  color: rgb(var(--warning-6)) !important;
+  vertical-align: -2px;
+}
+
+.priority-feed-title {
+  color: var(--color-text-2);
+  font-weight: 500;
+}
+
+.priority-feed-title-label {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.priority-feed-group + .arco-collapse {
+  margin-top: 2px;
+}
+
 .arco-collapse-item-header-title {
   width: 100%;
 }

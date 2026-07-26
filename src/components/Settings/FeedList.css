@@ -10,6 +10,10 @@
   border-radius: 0 !important;
 }
 
+.priority-feed-button {
+  color: rgb(var(--warning-6));
+}
+
 .feed-table-action-bar {
   display: flex;
   align-items: center;

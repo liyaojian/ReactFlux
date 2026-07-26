@@ -3,6 +3,7 @@ import { useCallback, useRef } from "react"
 import {
   getCategories,
   getCounters,
+  getCurrentUser,
   getFeeds,
   getIntegrationsStatus,
   getTodayEntries,
@@ -10,6 +11,7 @@ import {
 } from "@/apis"
 import {
   setCategoriesData,
+  setCurrentUserId,
   setFeedsData,
   setHasIntegrations,
   setHistoryCount,
@@ -19,6 +21,7 @@ import {
   setUnreadTodayCount,
   setVersion,
 } from "@/store/dataState"
+import { prunePriorityFeeds } from "@/store/priorityFeedsState"
 import compareVersions from "@/utils/version"
 
 const useAppData = () => {
@@ -70,6 +73,15 @@ const useAppData = () => {
     }
   }, [])
 
+  const fetchCurrentUser = useCallback(async () => {
+    try {
+      return await getCurrentUser()
+    } catch (error) {
+      console.error("Error fetching current user:", error)
+      return null
+    }
+  }, [])
+
   const updateUnreadInfo = useCallback((feeds, counters) => {
     if (!feeds || !counters) {
       return
@@ -109,6 +121,7 @@ const useAppData = () => {
       const [counters, feeds] = await Promise.all([fetchCounters(), fetchFeeds()])
 
       updateUnreadInfo(feeds, counters)
+      prunePriorityFeeds(feeds)
       await fetchUnreadToday()
 
       return { counters, feeds }
@@ -129,7 +142,14 @@ const useAppData = () => {
     setIsCoreDataReady(false)
 
     try {
-      const [feeds, categories] = await Promise.all([fetchFeeds(), fetchCategories()])
+      const [feeds, categories, currentUser] = await Promise.all([
+        fetchFeeds(),
+        fetchCategories(),
+        fetchCurrentUser(),
+      ])
+
+      setCurrentUserId(currentUser?.id ?? null)
+      prunePriorityFeeds(feeds)
 
       setIsCoreDataReady(true)
 
@@ -146,7 +166,7 @@ const useAppData = () => {
       updateUnreadInfo(feeds, counters)
 
       setIsAppDataReady(true)
-      return { counters, feeds, categories, version, todayData }
+      return { counters, feeds, categories, currentUser, version, todayData }
     } catch (error) {
       console.error("Error fetching app data:", error)
     } finally {
@@ -155,6 +175,7 @@ const useAppData = () => {
   }, [
     fetchCategories,
     fetchCounters,
+    fetchCurrentUser,
     fetchFeeds,
     fetchIntegrationStatus,
     fetchUnreadToday,

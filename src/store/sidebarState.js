@@ -9,6 +9,11 @@ export const expandedCategoriesState = persistentAtom("expandedCategories", [], 
   decode: JSON.parse,
 })
 
+export const priorityFeedsExpandedState = persistentAtom("priorityFeedsExpanded", true, {
+  encode: String,
+  decode: (value) => value !== "false",
+})
+
 export const lastVisitedPathState = persistentAtom("lastVisitedPath", "", {
   encode: (value) => value,
   decode: (value) => (typeof value === "string" ? value : ""),
@@ -38,4 +43,8 @@ export const getLandingPath = () => {
 
 export const setExpandedCategories = (keys) => {
   expandedCategoriesState.set(keys)
+}
+
+export const setPriorityFeedsExpanded = (expanded) => {
+  priorityFeedsExpandedState.set(expanded)
 }

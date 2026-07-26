@@ -15,6 +15,7 @@ const defaultValue = {
   historyCount: 0,
   feedsData: [],
   categoriesData: [],
+  currentUserId: null,
   version: "",
   hasIntegrations: false,
 }
@@ -113,6 +114,7 @@ export const unreadTotalState = computed([dataState, filteredFeedsState], (data,
 })
 
 export const setCategoriesData = createSetter(dataState, "categoriesData")
+export const setCurrentUserId = createSetter(dataState, "currentUserId")
 export const setFeedsData = createSetter(dataState, "feedsData")
 export const setHasIntegrations = createSetter(dataState, "hasIntegrations")
 export const setHistoryCount = createSetter(dataState, "historyCount")

@@ -11,7 +11,14 @@ import {
   Tooltip,
   Typography,
 } from "@arco-design/web-react"
-import { IconDelete, IconEdit, IconQuestionCircle, IconRefresh } from "@arco-design/web-react/icon"
+import {
+  IconDelete,
+  IconEdit,
+  IconQuestionCircle,
+  IconRefresh,
+  IconStar,
+  IconStarFill,
+} from "@arco-design/web-react/icon"
 import { useStore } from "@nanostores/react"
 import { atom, computed } from "nanostores"
 import { Fragment, useEffect, useMemo, useState } from "react"
@@ -25,6 +32,7 @@ import { handleFeedRefresh, updateFeedStatus, useFeedOperations } from "@/hooks/
 import { polyglotState } from "@/hooks/useLanguage"
 import useScreenWidth from "@/hooks/useScreenWidth"
 import { dataState, setFeedsData } from "@/store/dataState"
+import { priorityFeedIdsState, togglePriorityFeed } from "@/store/priorityFeedsState"
 import { settingsState } from "@/store/settingsState"
 import { generateRelativeTime } from "@/utils/date"
 import { filterByQuery } from "@/utils/kmp"
@@ -354,6 +362,7 @@ const FeedList = () => {
   const { showDetailedRelativeTime } = useStore(settingsState)
   const filterType = useStore(filterTypeState)
   const tableData = useStore(tableDataState)
+  const priorityFeedIds = useStore(priorityFeedIdsState)
   const { polyglot } = useStore(polyglotState)
   const tooltipLines = polyglot.t("search.tooltip").split("\n")
 
@@ -475,35 +484,54 @@ const FeedList = () => {
       title: polyglot.t("feed_table.table_actions"),
       dataIndex: "op",
       fixed: "right",
-      width: 100,
-      render: (_, record) => (
-        <Space style={{ marginLeft: -10 }}>
-          <CustomTooltip mini content={polyglot.t("feed_table.table_feed_edit_tooltip")}>
-            <Button
-              icon={<IconEdit />}
-              shape="circle"
-              size="mini"
-              onClick={() => handleSelectFeed(record)}
-            />
-          </CustomTooltip>
-          <CustomTooltip mini content={polyglot.t("feed_table.table_feed_refresh_tooltip")}>
-            <Button
-              icon={<IconRefresh />}
-              shape="circle"
-              size="mini"
-              onClick={() => refreshSingleFeed(record)}
-            />
-          </CustomTooltip>
-          <CustomTooltip mini content={polyglot.t("feed_table.table_feed_remove_tooltip")}>
-            <Button
-              icon={<IconDelete />}
-              shape="circle"
-              size="mini"
-              onClick={() => handleDeleteFeed(record)}
-            />
-          </CustomTooltip>
-        </Space>
-      ),
+      width: 132,
+      render: (_, record) => {
+        const isPriorityFeed = priorityFeedIds.includes(record.key)
+        const priorityTooltip = polyglot.t(
+          isPriorityFeed
+            ? "feed_table.remove_priority_feed_tooltip"
+            : "feed_table.add_priority_feed_tooltip",
+        )
+
+        return (
+          <Space style={{ marginLeft: -10 }}>
+            <CustomTooltip mini content={priorityTooltip}>
+              <Button
+                aria-label={priorityTooltip}
+                className={isPriorityFeed ? "priority-feed-button" : undefined}
+                icon={isPriorityFeed ? <IconStarFill /> : <IconStar />}
+                shape="circle"
+                size="mini"
+                onClick={() => togglePriorityFeed(record.key)}
+              />
+            </CustomTooltip>
+            <CustomTooltip mini content={polyglot.t("feed_table.table_feed_edit_tooltip")}>
+              <Button
+                icon={<IconEdit />}
+                shape="circle"
+                size="mini"
+                onClick={() => handleSelectFeed(record)}
+              />
+            </CustomTooltip>
+            <CustomTooltip mini content={polyglot.t("feed_table.table_feed_refresh_tooltip")}>
+              <Button
+                icon={<IconRefresh />}
+                shape="circle"
+                size="mini"
+                onClick={() => refreshSingleFeed(record)}
+              />
+            </CustomTooltip>
+            <CustomTooltip mini content={polyglot.t("feed_table.table_feed_remove_tooltip")}>
+              <Button
+                icon={<IconDelete />}
+                shape="circle"
+                size="mini"
+                onClick={() => handleDeleteFeed(record)}
+              />
+            </CustomTooltip>
+          </Space>
+        )
+      },
     },
   ].filter(Boolean)
 

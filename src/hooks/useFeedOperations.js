@@ -5,6 +5,7 @@ import { markFeedAsRead as markFeedAsReadAPI } from "@/apis/feeds"
 import { polyglotState } from "@/hooks/useLanguage"
 import { contentState, setEntries } from "@/store/contentState"
 import { setFeedsData, setUnreadInfo } from "@/store/dataState"
+import { removePriorityFeed } from "@/store/priorityFeedsState"
 import { getUTCDate } from "@/utils/date"
 
 export const updateFeedStatus = (feed, isSuccessful, targetFeedId = null) => {
@@ -83,7 +84,9 @@ export const useFeedOperations = (useNotification = false) => {
     try {
       const response = await deleteFeed(feed.id || feed.key)
       if (response.status === 204) {
-        setFeedsData((feeds) => feeds.filter((f) => f.id !== (feed.id || feed.key)))
+        const feedId = feed.id || feed.key
+        setFeedsData((feeds) => feeds.filter((f) => f.id !== feedId))
+        removePriorityFeed(feedId)
         const successMessage = polyglot.t("feed_table.remove_feed_success", { title: feed.title })
         showMessage(successMessage)
       } else {

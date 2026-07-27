@@ -7,63 +7,137 @@
     display: flex;
     flex: none;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     box-sizing: border-box;
-    border: 0;
-    border-top: 1px solid rgb(var(--warning-3));
-    border-bottom: 1px solid rgb(var(--warning-3));
-    border-radius: 0;
-    background-color: rgb(var(--warning-1));
-    padding: 8px 12px;
-    width: 100%;
-    min-height: 40px;
-    color: var(--color-text-2);
+    margin: 0 10px 8px;
+    border: 1px solid rgba(var(--warning-3), 0.55);
+    border-radius: 12px;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--warning-1)) 0%,
+      color-mix(in srgb, rgb(var(--warning-1)) 70%, var(--color-bg-1) 30%) 100%
+    );
+    box-shadow:
+      0 1px 2px rgba(var(--warning-6), 0.06),
+      0 4px 12px rgba(var(--warning-6), 0.04);
+    padding: 10px 12px;
+    width: auto;
+    min-height: 44px;
+    color: var(--color-text-1);
     font: inherit;
     text-align: left;
     cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease,
+      border-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .priority-unread-reminder:active {
-    background-color: rgb(var(--warning-2));
+    border-color: rgba(var(--warning-4), 0.7);
+    background: linear-gradient(
+      135deg,
+      rgb(var(--warning-2)) 0%,
+      color-mix(in srgb, rgb(var(--warning-2)) 75%, var(--color-bg-1) 25%) 100%
+    );
+    box-shadow: 0 1px 2px rgba(var(--warning-6), 0.08);
+    transform: scale(0.985);
   }
 
   .priority-unread-reminder:focus-visible {
     outline: 2px solid rgb(var(--primary-6));
-    outline-offset: -2px;
+    outline-offset: 2px;
   }
 
-  .priority-unread-reminder__label {
+  .priority-unread-reminder__icon {
     display: flex;
-    flex: 1;
+    flex: none;
+    justify-content: center;
     align-items: center;
-    gap: 8px;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .priority-unread-reminder__label span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    border-radius: 10px;
+    background: rgb(var(--warning-2));
+    box-shadow: inset 0 0 0 1px rgba(var(--warning-3), 0.45);
+    width: 32px;
+    height: 32px;
   }
 
   .priority-unread-reminder__star {
-    flex: none;
     color: rgb(var(--warning-6));
     font-size: 16px;
   }
 
-  .priority-unread-reminder__count,
-  .priority-unread-reminder__arrow {
-    flex: none;
+  .priority-unread-reminder__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .priority-unread-reminder__title {
+    overflow: hidden;
+    color: var(--color-text-1);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .priority-unread-reminder__count {
-    font-size: 0.875rem;
+    overflow: hidden;
+    color: var(--color-text-3);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .priority-unread-reminder__badge {
+    display: inline-flex;
+    flex: none;
+    justify-content: center;
+    align-items: center;
+    border-radius: 999px;
+    background: rgb(var(--warning-6));
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    box-shadow: 0 1px 3px rgba(var(--warning-6), 0.28);
   }
 
   .priority-unread-reminder__arrow {
-    color: var(--color-text-3);
+    flex: none;
+    margin-left: -2px;
+    color: rgba(var(--warning-6), 0.65);
     font-size: 14px;
+    transition: transform 0.15s ease;
+  }
+
+  .priority-unread-reminder:active .priority-unread-reminder__arrow {
+    transform: translateX(2px);
+  }
+}
+
+/* Fallback when color-mix is unavailable */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  @media screen and (max-width: 768px) {
+    .priority-unread-reminder {
+      background: rgb(var(--warning-1));
+    }
+
+    .priority-unread-reminder:active {
+      background: rgb(var(--warning-2));
+    }
   }
 }

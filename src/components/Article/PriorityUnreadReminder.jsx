@@ -34,12 +34,17 @@ const PriorityUnreadReminder = () => {
       type="button"
       onClick={handleReminderClick}
     >
-      <span className="priority-unread-reminder__label">
+      <span aria-hidden="true" className="priority-unread-reminder__icon">
         <IconStarFill className="priority-unread-reminder__star" />
-        <span>{priorityFeedsLabel}</span>
       </span>
-      <strong className="priority-unread-reminder__count">{unreadCountLabel}</strong>
-      <IconRight className="priority-unread-reminder__arrow" />
+      <span className="priority-unread-reminder__content">
+        <span className="priority-unread-reminder__title">{priorityFeedsLabel}</span>
+        <span className="priority-unread-reminder__count">{unreadCountLabel}</span>
+      </span>
+      <span aria-hidden="true" className="priority-unread-reminder__badge">
+        {unreadCount > 99 ? "99+" : unreadCount}
+      </span>
+      <IconRight aria-hidden="true" className="priority-unread-reminder__arrow" />
     </button>
   )
 }

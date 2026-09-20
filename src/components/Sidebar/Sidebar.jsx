@@ -756,7 +756,7 @@ const updateAllEntriesAsRead = () => {
   setEntries((prev) => prev.map((entry) => ({ ...entry, status: "read" })))
 }
 
-const Sidebar = () => {
+const Sidebar = ({ scrollableNodeProps } = {}) => {
   const { isCoreDataReady } = useStore(dataState)
   const { polyglot } = useStore(polyglotState)
 
@@ -853,7 +853,11 @@ const Sidebar = () => {
   return (
     <div className="sidebar-container">
       {IS_IOS_SAFARI ? (
-        <div className="sidebar-scroll-native" style={{ maxHeight: "100%" }}>
+        <div
+          {...scrollableNodeProps}
+          className="sidebar-scroll-native"
+          style={{ maxHeight: "100%" }}
+        >
           <Menu hasCollapseButton={false} selectedKeys={selectedKeys}>
             <div className="menu-header">
               <span style={{ display: "flex", alignItems: "center" }}>
@@ -905,7 +909,7 @@ const Sidebar = () => {
           </Menu>
         </div>
       ) : (
-        <SimpleBar style={{ maxHeight: "100%" }}>
+        <SimpleBar scrollableNodeProps={scrollableNodeProps} style={{ maxHeight: "100%" }}>
           <Menu hasCollapseButton={false} selectedKeys={selectedKeys}>
             <div className="menu-header">
               <span style={{ display: "flex", alignItems: "center" }}>

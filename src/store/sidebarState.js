@@ -17,6 +17,9 @@ export const priorityFeedsExpandedState = persistentAtom("priorityFeedsExpanded"
 
 export const sidebarDrawerVisibleState = atom(false)
 
+// Keep the mobile menu position across route component remounts.
+export const sidebarDrawerScrollTopState = atom(0)
+
 export const lastVisitedPathState = persistentAtom("lastVisitedPath", "", {
   encode: (value) => value,
   decode: (value) => (typeof value === "string" ? value : ""),
